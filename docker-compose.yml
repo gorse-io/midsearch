@@ -1,0 +1,15 @@
+version: "3"
+services:
+   postgres:
+     image: ankane/pgvector
+     ports:
+       - 5432:5432
+     environment:
+       POSTGRES_DB: gorse
+       POSTGRES_USER: gorse
+       POSTGRES_PASSWORD: gorse_pass
+     volumes:
+       - postgres_data:/var/lib/postgresql/data
+
+volumes:
+   postgres_data:

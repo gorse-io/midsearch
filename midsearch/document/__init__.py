@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask import Flask
+class Document:
 
-app = Flask(__name__)
-
-
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+    def __init__(self, name: str, content: str):
+        self.name = name
+        self.content = content

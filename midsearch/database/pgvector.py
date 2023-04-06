@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask import Flask
+from midsearch.database import Database
 
-app = Flask(__name__)
+import sqlalchemy
 
+class DocumentEmbedding:
+    name = sqlalchemy.Column(sqlalchemy.String, primary_key=True)
+    embedding = sqlalchemy.Column(sqlalchemy.ARRAY(sqlalchemy.Float))
 
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+class PGVector(Database):
+    pass
