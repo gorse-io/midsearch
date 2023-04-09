@@ -7,6 +7,10 @@ import numpy as np
 class Database(ABC):
 
     @abstractmethod
+    def drop_all(self):
+        pass
+
+    @abstractmethod
     def upsert_document(self, document: Document):
         pass
 
@@ -16,6 +20,10 @@ class Database(ABC):
 
     @abstractmethod
     def get_document(self, name: str) -> Optional[Document]:
+        pass
+
+    @abstractmethod
+    def get_documents(self, n: int, offset: int = 0) -> List[Document]:
         pass
 
     @abstractmethod

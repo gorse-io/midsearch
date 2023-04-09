@@ -27,17 +27,27 @@ class TestPGVector(unittest.TestCase):
         self.database = PGVector(url)
 
     def tearDown(self):
-        pass
+        self.database.drop_all()
 
     def test_crud(self):
         # upsert document
         self.database.upsert_document(
-            Document('alice', 'Alice in Wonderland', np.zeros(1536)))
+            Document('alice', 'Alice in Wonderland', np.ones(1536)))
+        self.database.upsert_document(
+            Document('bob', 'Bob in Wonderland', np.ones(1536) * 2))
+        self.database.upsert_document(
+            Document('carol', 'Carol in Wonderland', np.ones(1536) * 3))
+        # get documents
+        documents = self.database.get_documents(3)
+        self.assertEqual(len(documents), 3)
+        self.assertEqual(documents[0].name, 'alice')
+        self.assertEqual(documents[1].name, 'bob')
+        self.assertEqual(documents[2].name, 'carol')
         # get document
         document = self.database.get_document('alice')
         self.assertEqual(document.name, 'alice')
         self.assertEqual(document.content, 'Alice in Wonderland')
-        self.assertTrue(np.array_equal(document.embedding(), np.zeros(1536)))
+        self.assertTrue(np.array_equal(document.embedding(), np.ones(1536)))
         # delete document
         self.database.delete_document('alice')
         document = self.database.get_document('alice')

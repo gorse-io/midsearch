@@ -46,6 +46,9 @@ class PGVector(Database):
         # create tables if not exists
         Base.metadata.create_all(self.engine)
 
+    def drop_all(self):
+        Base.metadata.drop_all(self.engine)
+
     def upsert_document(self, document: Document):
         with Session(self.engine) as session:
             session.merge(DocumentEmbedding(
@@ -70,6 +73,19 @@ class PGVector(Database):
                 content=document.content,
                 embedding=document.embedding,
             )
+
+    def get_documents(self, n: int, offset: int = 0) -> List[Document]:
+        with Session(self.engine) as session:
+            results = session.query(DocumentEmbedding).limit(
+                n).offset(offset).all()
+            return [
+                Document(
+                    name=result.name,
+                    content=result.content,
+                    embedding=result.embedding,
+                )
+                for result in results
+            ]
 
     def search_documents(self, embedding: np.ndarray, k: int) -> List[Document]:
         with Session(self.engine) as session:

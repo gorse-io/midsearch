@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import numpy as np
+import openai
 from typing import List, Optional
 
 
@@ -25,5 +26,8 @@ class Document:
 
     def embedding(self) -> np.ndarray:
         if self._embedding is None:
-            self._embedding = self._compute_embedding()
+            if len(self.content) == 0:
+                raise ValueError('Empty content')
+            self._embedding = np.array(openai.Embedding.create(
+                input=[self.content], model='text-embedding-ada-002')['data'][0]['embedding'])
         return self._embedding
