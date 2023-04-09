@@ -20,3 +20,18 @@ app = Flask(__name__)
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
+
+
+@app.route("/docs", methods=["GET"])
+def get_docs():
+    return "<p>Documents</p>"
+
+
+@app.route("/docs", methods=["POST"])
+def post_docs():
+    return "<p>Document</p>"
+
+
+@app.route("/doc/<doc_id>", methods=["GET"])
+def get_doc(doc_id):
+    return f"<p>Document {doc_id}</p>"

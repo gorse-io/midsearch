@@ -12,22 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
-from typing import List
-
-from midsearch.document import Document
-
-
-class Database(ABC):
-
-    @abstractmethod
-    def upsert_document(self, document: Document):
-        pass
-
-    @abstractmethod
-    def delete_document(self, name: str):
-        pass
-
-    @abstractmethod
-    def search_documents(self, query: str) -> List[Document]:
-        pass
+from midsearch.database.base import Database
+from midsearch.database.pgvector import PGVector

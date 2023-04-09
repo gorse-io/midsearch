@@ -12,8 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
+from typing import List, Optional
+
+
 class Document:
 
-    def __init__(self, name: str, content: str):
+    def __init__(self, name: str, content: str, embedding: Optional[np.ndarray] = None):
         self.name = name
         self.content = content
+        self._embedding = embedding
+
+    def embedding(self) -> np.ndarray:
+        if self._embedding is None:
+            self._embedding = self._compute_embedding()
+        return self._embedding

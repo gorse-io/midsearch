@@ -18,6 +18,17 @@ jobs:
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
+    services:
+      pgvector:
+        image: ankane/pgvector
+        env:
+          POSTGRES_DB: gorse
+          POSTGRES_USER: gorse
+          POSTGRES_PASSWORD: gorse_pass
+        ports:
+          - 5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
