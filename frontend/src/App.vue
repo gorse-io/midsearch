@@ -13,13 +13,13 @@
       <v-container>
         <v-row>
           <v-col cols="12">
-            <v-text-field v-model="message" append-icon="mdi-magnify" variant="filled" label="Search" type="text"
+            <v-text-field v-model="query" append-icon="mdi-magnify" variant="filled" label="Search" type="text"
               @click:append="search"></v-text-field>
           </v-col>
         </v-row>
-        <v-row v-for="result in results" :key="result">
+        <v-row v-for="document in documents">
           <v-col>
-            <v-card :text="result"></v-card>
+            <v-card :text="document.page_content"></v-card>
           </v-col>
         </v-row>
       </v-container>
@@ -28,12 +28,14 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'App',
   data() {
     return {
       query: '',
-      results: [],
+      documents: [],
       version: '',
       items: [
         { title: 'Search', icon: 'mdi-magnify', link: '/' },
@@ -42,7 +44,19 @@ export default {
   },
   methods: {
     search() {
-      this.results = ['A','C'];
+      if (this.query === '') {
+        this.documents = [];
+        return;
+      }
+      axios.get('/api/search/', {
+        params: {
+          query: this.query
+        }
+      }).then((response) => {
+        this.documents = response.data;
+      }).catch((error) => {
+        console.log(error);
+      });
     }
   }
 }
