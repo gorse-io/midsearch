@@ -1,0 +1,57 @@
+<template>
+	<v-container>
+		<v-row>
+			<v-col cols="12">
+				<v-text-field v-model="query" append-icon="mdi-magnify" variant="filled" label="Search" type="text"
+					@click:append="search"></v-text-field>
+			</v-col>
+		</v-row>
+		<v-row v-for="document in documents">
+			<v-col>
+				<v-card>
+					<v-card-text class="markdown-body" v-html="document.page_content"></v-card-text>
+				</v-card>
+			</v-col>
+		</v-row>
+	</v-container>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+    name: "Search",
+    data() {
+        return {
+            query: "",
+            documents: [],
+        };
+    },
+    methods: {
+        search() {
+            if (this.query === "") {
+                this.documents = [];
+                return;
+            }
+            axios.get("/api/search/", {
+                params: {
+                    query: this.query
+                }
+            }).then((response) => {
+                this.documents = response.data;
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+    },
+}
+</script>
+
+<style>
+.markdown-body {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+</style>

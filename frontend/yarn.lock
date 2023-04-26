@@ -1243,6 +1243,7 @@ __metadata:
     core-js: ^3.8.3
     eslint: ^8.22.0
     eslint-plugin-vue: ^9.3.0
+    github-markdown-css: ^4.0.0
     roboto-fontface: "*"
     sass: ^1.55.0
     vite: ^3.1.9
@@ -1309,6 +1310,13 @@ __metadata:
     strip-ansi: ^6.0.1
     wide-align: ^1.1.5
   checksum: 788b6bfe52f1dd8e263cda800c26ac0ca2ff6de0b6eee2fe0d9e3abf15e149b651bd27bf5226be10e6e3edb5c4e5d5985a5a1a98137e7a892f75eff76467ad2d
+  languageName: node
+  linkType: hard
+
+"github-markdown-css@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "github-markdown-css@npm:4.0.0"
+  checksum: fddb320b218d1b24d49d9a0887fbbfb6adb410774ebe9d6c17a4a899640d5e228447183b41a9360d3a3043f6400681eba3a3389cbd77ef878c0c4df79d95c277
   languageName: node
   linkType: hard
 
