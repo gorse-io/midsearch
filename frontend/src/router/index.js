@@ -4,24 +4,24 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    children: [
-      {
-        path: 'search',
-        name: 'Search',
-        component: () => import('@/views/Search.vue'),
-      },
-      {
-        path: 'chat',
-        name: 'Chat',
-        component: () => import('@/views/Chat.vue'),
-      },
-      {
-        path: 'history',
-        name: 'History',
-        component: () => import('@/views/History.vue'),
-      }
-    ],
+    name: 'Home',
+    component: () => import('@/views/Home.vue'),
   },
+  {
+    path: '/search',
+    name: 'Search',
+    component: () => import('@/views/Search.vue'),
+  },
+  {
+    path: '/chat',
+    name: 'Chat',
+    component: () => import('@/views/Chat.vue'),
+  },
+  {
+    path: '/history',
+    name: 'History',
+    component: () => import('@/views/History.vue'),
+  }
 ]
 
 const router = createRouter({

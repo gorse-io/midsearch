@@ -12,9 +12,7 @@
 			</v-col>
 			<v-col v-if="reply">
 				<v-card>
-					<v-card-text>
-						{{ reply }}
-					</v-card-text>
+					<v-card-text class="markdown-body" v-html="reply"></v-card-text>
 				</v-card>
 			</v-col>
 		</v-row>
@@ -39,8 +37,8 @@ export default {
 				this.reply = '';
 				return;
 			}
+			this.reply = '';
 			this.waiting = true;
-
 			axios.get("/api/chat/", {
 				params: {
 					message: this.message

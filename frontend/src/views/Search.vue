@@ -46,12 +46,3 @@ export default {
     },
 }
 </script>
-
-<style>
-.markdown-body {
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-</style>

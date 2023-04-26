@@ -27,10 +27,10 @@ export default {
             documents: [],
             version: "",
             items: [
+                { title: "Home", icon: "mdi-home", link: "/" },
                 { title: "Chat", icon: "mdi-chat", link: "/chat" },
                 { title: "Search", icon: "mdi-magnify", link: "/search" },
                 { title: "History", icon: "mdi-history", link: "/history" },
-                // { title: "Documents", icon: "mdi-file-document", link: "/documents" },
             ]
         };
     },

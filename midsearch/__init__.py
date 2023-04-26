@@ -46,4 +46,4 @@ def search():
 @app.route("/api/chat/")
 def chat():
     message = request.args.get('message')
-    return qa.run(message)
+    return mistune.html(qa.run(message))
