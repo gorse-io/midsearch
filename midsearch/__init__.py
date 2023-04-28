@@ -19,6 +19,8 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 import mistune
+from midsearch.database import PGVector, Conversation
+import os
 
 
 embeddings = OpenAIEmbeddings()
@@ -26,6 +28,7 @@ db = Chroma(persist_directory='conchdb/data', embedding_function=embeddings)
 retriever = VectorStoreRetriever(vectorstore=db)
 qa = RetrievalQA.from_llm(llm=ChatOpenAI(temperature=0.1), retriever=retriever)
 
+pg = PGVector(os.environ['POSTGRES_URL'])
 
 app = Flask(__name__)
 
@@ -45,5 +48,19 @@ def search():
 
 @app.route("/api/chat/")
 def chat():
-    message = request.args.get('message')
-    return mistune.html(qa.run(message))
+    question = request.args.get('message')
+    answer = qa.run(question)
+    pg.add_conversation(Conversation(question=question, answer=answer))
+    return mistune.html(answer)
+
+
+@app.route("/api/conversations/", methods=['GET'])
+def get_conversations():
+    offset = request.args.get('offset', 0)
+    n = request.args.get('n', 10)
+    conversations = pg.get_conversations(offset=offset, n=n)
+    return jsonify([{
+        'question': conversation.question,
+        'answer': mistune.html(conversation.answer),
+        'promppt': conversation.promppt,
+    } for conversation in conversations])
