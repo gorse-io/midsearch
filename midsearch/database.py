@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import numpy as np
 import sqlalchemy
 import datetime
@@ -23,12 +23,22 @@ from pgvector.sqlalchemy import Vector
 Base = declarative_base()
 
 
-# class DocumentEmbedding(Base):
-#     __tablename__ = "document_embedding"
+class Document(Base):
+    __tablename__ = "document"
 
-#     name = sqlalchemy.Column(sqlalchemy.String, primary_key=True)
-#     content = sqlalchemy.Column(sqlalchemy.String)
-#     embedding = sqlalchemy.Column(Vector(1536))
+    id = sqlalchemy.Column(sqlalchemy.String, primary_key=True)
+    updated_at = sqlalchemy.Column(
+        sqlalchemy.DateTime, default=datetime.datetime.utcnow)
+
+
+class Chunk(Base):
+    __tablename__ = "chunk"
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    doc_id = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey(
+        "document.id", ondelete="CASCADE", deferrable=True), nullable=False)
+    content = sqlalchemy.Column(sqlalchemy.String)
+    embedding = sqlalchemy.Column(Vector(1536))
 
 
 class Conversation(Base):
@@ -61,19 +71,20 @@ class PGVector:
     # def drop_all(self):
     #     Base.metadata.drop_all(self.engine)
 
-    # def upsert_document(self, document: Document):
-    #     with Session(self.engine) as session:
-    #         session.merge(DocumentEmbedding(
-    #             name=document.name,
-    #             content=document.content,
-    #             embedding=document.embedding(),
-    #         ))
-    #         session.commit()
+    def add_document(self, document: Tuple[Document, List[Chunk]]):
+        with Session(self.engine) as session:
+            session.execute('SET CONSTRAINTS ALL DEFERRED')
+            # delete existing document
+            session.query(Document).filter_by(id=document[0].id).delete()
+            # insert new document
+            session.add(document[0])
+            session.add_all(document[1])
+            session.commit()
 
-    # def delete_document(self, name: str):
-    #     with Session(self.engine) as session:
-    #         session.query(DocumentEmbedding).filter_by(name=name).delete()
-    #         session.commit()
+    def delete_document(self, id: str):
+        with Session(self.engine) as session:
+            session.query(Document).filter_by(id=id).delete()
+            session.commit()
 
     # def get_document(self, name: str) -> Optional[Document]:
     #     with Session(self.engine) as session:
@@ -86,18 +97,19 @@ class PGVector:
     #             embedding=document.embedding,
     #         )
 
-    # def get_documents(self, n: int, offset: int = 0) -> List[Document]:
-    #     with Session(self.engine) as session:
-    #         results = session.query(DocumentEmbedding).limit(
-    #             n).offset(offset).all()
-    #         return [
-    #             Document(
-    #                 name=result.name,
-    #                 content=result.content,
-    #                 embedding=result.embedding,
-    #             )
-    #             for result in results
-    #         ]
+    def get_documents(self, n: int, offset: int = 0) -> List[Tuple[Document, List[Chunk]]]:
+        with Session(self.engine) as session:
+            documents = session.query(Document).limit(n).offset(offset).all()
+            results = []
+            for document in documents:
+                chunks = session.query(Chunk).filter_by(
+                    doc_id=document.id).all()
+                results.append((document, chunks))
+            return results
+
+    def count_documents(self) -> int:
+        with Session(self.engine) as session:
+            return session.query(Document).count()
 
     # def search_documents(self, embedding: np.ndarray, k: int) -> List[Document]:
     #     with Session(self.engine) as session:
@@ -124,7 +136,10 @@ class PGVector:
 
     def update_conversation(self, id: int, helpful: bool):
         with Session(self.engine) as session:
-            print(id, helpful)
             session.query(Conversation).filter_by(id=id).update(
                 {Conversation.helpful: helpful})
             session.commit()
+
+    def count_conversations(self) -> int:
+        with Session(self.engine) as session:
+            return session.query(Conversation).count()

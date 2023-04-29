@@ -3,54 +3,34 @@
         <v-row>
             <v-col cols="12">
                 <v-expansion-panels>
-                    <v-expansion-panel v-for="[index, conversation] in conversations.entries()">
+                    <v-expansion-panel v-for="[index, document] in documents.entries()">
                         <v-expansion-panel-title>
-                            {{ conversation.question }}
-                            <template v-slot:actions>
-                                <v-icon v-if="conversation.helpful === true" color="teal" icon="mdi-check">
-                                </v-icon>
-                                <v-icon v-else-if="conversation.helpful === false" color="error" icon="mdi-close">
-                                </v-icon>
-                                <v-icon v-else-if="conversation.helpful === null" color="warning" icon="mdi-radiobox-blank">
-                                </v-icon>
-                            </template>
+                            {{ document.id }}
                         </v-expansion-panel-title>
                         <v-expansion-panel-text>
-                            <v-row>
+                            <v-row v-for="chunk in document.chunks">
                                 <v-col>
-                                    <article class="markdown-body" v-html="conversation.answer"></article>
+                                    <v-card>
+                                        <v-card-item>
+                                            <article class="markdown-body" v-html="chunk.content"></article>
+                                        </v-card-item>
+                                    </v-card>
                                 </v-col>
                             </v-row>
                             <v-row>
                                 <v-col>
-                                    <v-btn prepend-icon="mdi-check" color="teal" size="small" variant="text"
-                                        @click="accept(index)">
-                                        Accept
-                                    </v-btn>
-                                    <v-btn prepend-icon="mdi-close" color="error" size="small" variant="text"
-                                        @click="reject(index)">
-                                        Reject
-                                    </v-btn>
                                     <v-btn prepend-icon="mdi-delete" color="warning" size="small" variant="text">
                                         Delete
                                     </v-btn>
-                                    <v-btn prepend-icon="mdi-content-copy" color="primary" size="small" variant="text">
-                                        Copy Question
-                                    </v-btn>
-                                    <v-btn prepend-icon="mdi-message-arrow-right-outline" color="primary" size="small"
-                                        variant="text">
-                                        View Prompt
-                                    </v-btn>
                                 </v-col>
                             </v-row>
-
                         </v-expansion-panel-text>
                     </v-expansion-panel>
                 </v-expansion-panels>
             </v-col>
         </v-row>
         <v-row class="justify-center">
-            <v-pagination :length="page_count" rounded="circle"></v-pagination>
+            <v-pagination :length="page_count" :total-visible="7" rounded="circle"></v-pagination>
         </v-row>
     </v-container>
 </template>
@@ -62,21 +42,25 @@ export default {
     name: "History",
     data() {
         return {
-            conversations: [],
+            documents: [],
             page_count: 0,
         }
     },
     mounted() {
-        axios.get('/api/conversations/')
+        axios.get('/api/documents/', {
+            params: {
+                n: 20,
+            }
+        })
             .then(response => {
-                this.conversations = response.data
+                this.documents = response.data
             })
             .catch(error => {
                 console.log(error)
             })
-        axios.get('/api/conversations/count/')
+        axios.get('/api/documents/count')
             .then(response => {
-                this.page_count = Math.ceil(response.data / 20);
+                this.page_count = Math.ceil(response.data / 20)
             })
             .catch(error => {
                 console.log(error)

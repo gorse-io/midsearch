@@ -21,6 +21,7 @@ from langchain.chat_models import ChatOpenAI
 import mistune
 from midsearch.database import PGVector, Conversation
 import os
+from midsearch.docutils import create_markdown_document
 
 
 embeddings = OpenAIEmbeddings()
@@ -69,8 +70,40 @@ def get_conversations():
     } for conversation in conversations])
 
 
+@app.route("/api/conversations/count/", methods=['GET'])
+def count_conversations():
+    return jsonify(pg.count_conversations())
+
+
 @app.route("/api/conversation/<id>", methods=['POST'])
 def update_conversation(id: int):
     helpful = request.form.get('helpful')
     pg.update_conversation(id=id, helpful=(helpful == 'true'))
+    return jsonify({'success': True})
+
+
+@app.route("/api/documents/count/", methods=['GET'])
+def count_documents():
+    return jsonify(pg.count_documents())
+
+
+@app.route("/api/documents/", methods=['GET'])
+def get_documents():
+    offset = request.args.get('offset', 0)
+    n = request.args.get('n', 10)
+    documents = pg.get_documents(offset=offset, n=n)
+    return jsonify([{
+        'id': document[0].id,
+        'updated_at': document[0].updated_at,
+        'chunks': [{
+            'content': mistune.html(chunk.content),
+        } for chunk in document[1]],
+    } for document in documents])
+
+
+@app.route("/api/document/<string:id>", methods=['POST'])
+def update_document(id: str):
+    content = request.form.get('content')
+    document = create_markdown_document(id, content)
+    pg.add_document(document)
     return jsonify({'success': True})
