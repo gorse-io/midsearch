@@ -15,6 +15,7 @@
 from typing import List, Optional
 import numpy as np
 import sqlalchemy
+import datetime
 from sqlalchemy.orm import declarative_base, Session
 from pgvector.sqlalchemy import Vector
 
@@ -38,7 +39,9 @@ class Conversation(Base):
     question = sqlalchemy.Column(sqlalchemy.String)
     answer = sqlalchemy.Column(sqlalchemy.String)
     promppt = sqlalchemy.Column(sqlalchemy.String)
-
+    helpful = sqlalchemy.Column(sqlalchemy.Boolean)
+    timestamp = sqlalchemy.Column(
+        sqlalchemy.DateTime, default=datetime.datetime.utcnow)
 
 
 class PGVector:
@@ -118,3 +121,10 @@ class PGVector:
         with Session(self.engine) as session:
             return session.query(Conversation).limit(
                 n).offset(offset).all()
+
+    def update_conversation(self, id: int, helpful: bool):
+        with Session(self.engine) as session:
+            print(id, helpful)
+            session.query(Conversation).filter_by(id=id).update(
+                {Conversation.helpful: helpful})
+            session.commit()

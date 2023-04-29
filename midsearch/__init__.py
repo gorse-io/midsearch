@@ -60,7 +60,17 @@ def get_conversations():
     n = request.args.get('n', 10)
     conversations = pg.get_conversations(offset=offset, n=n)
     return jsonify([{
+        'id': conversation.id,
         'question': conversation.question,
         'answer': mistune.html(conversation.answer),
         'promppt': conversation.promppt,
+        'helpful': conversation.helpful,
+        'timestamp': conversation.timestamp,
     } for conversation in conversations])
+
+
+@app.route("/api/conversation/<id>", methods=['POST'])
+def update_conversation(id: int):
+    helpful = request.form.get('helpful')
+    pg.update_conversation(id=id, helpful=(helpful == 'true'))
+    return jsonify({'success': True})
