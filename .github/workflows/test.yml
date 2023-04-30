@@ -44,5 +44,6 @@ jobs:
         run: |
           pytest
         env:
+          OPENAI_API_KEY: sk-xxx
           PYTHONPATH: ${{ github.workspace }}
           POSTGRES_URL: postgresql://midsearch:midsearch_password@localhost:${{ job.services.pgvector.ports[5432] }}/midsearch
