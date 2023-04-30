@@ -13,10 +13,6 @@
 # limitations under the License.
 
 from flask import Flask, jsonify, request
-from langchain.vectorstores import Chroma
-from langchain.vectorstores.base import VectorStoreRetriever
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 import mistune
 from midsearch.database import PGVector, Conversation
