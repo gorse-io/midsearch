@@ -17,6 +17,9 @@ import os
 from midsearch.database import PGVector
 
 
+os.environ['OPENAI_API_KEY'] = 'sk-1234567890abcdefg-1234567890abcdefg'
+
+
 class TestPGVector(unittest.TestCase):
 
     def setUp(self):
