@@ -6,14 +6,24 @@
                     <v-expansion-panel v-for="[index, document] in documents.entries()">
                         <v-expansion-panel-title>
                             {{ document.id }}
+                            <template v-slot:actions>
+                                <v-icon color="primary" icon="mdi-language-markdown">
+                                </v-icon>
+                            </template>
                         </v-expansion-panel-title>
                         <v-expansion-panel-text>
                             <v-row v-for="chunk in document.chunks">
                                 <v-col>
                                     <v-card>
                                         <v-card-item>
-                                            <article class="markdown-body" v-html="chunk.content"></article>
+                                            <v-chip color="primary">
+                                                <v-icon start icon="mdi-alpha-a"></v-icon>
+                                                {{ chunk.token_count }}
+                                            </v-chip>
                                         </v-card-item>
+                                        <v-card-text>
+                                            <article class="markdown-body" v-html="chunk.content"></article>
+                                        </v-card-text>
                                     </v-card>
                                 </v-col>
                             </v-row>

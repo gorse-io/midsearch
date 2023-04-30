@@ -2,8 +2,14 @@ from typing import List, Tuple
 from midsearch.database import Document, Chunk
 from langchain.text_splitter import MarkdownTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
+import tiktoken
 
+encoding = tiktoken.get_encoding("cl100k_base")
 embeddings = OpenAIEmbeddings()
+
+
+def count_tokens(text: str) -> int:
+    return len(encoding.encode(text))
 
 
 def create_document(id: str, chunks: List[str]) -> Tuple[Document, List[Chunk]]:

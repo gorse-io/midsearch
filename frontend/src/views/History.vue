@@ -34,7 +34,8 @@
                                     <v-btn prepend-icon="mdi-delete" color="warning" size="small" variant="text">
                                         Delete
                                     </v-btn>
-                                    <v-btn prepend-icon="mdi-content-copy" color="primary" size="small" variant="text">
+                                    <v-btn prepend-icon="mdi-content-copy" color="primary" size="small" variant="text"
+                                        @click="copyToClipBoard(conversation.question)">
                                         Copy Question
                                     </v-btn>
                                     <v-btn prepend-icon="mdi-message-arrow-right-outline" color="primary" size="small"
@@ -104,6 +105,9 @@ export default {
                 .catch(error => {
                     console.log(error)
                 })
+        },
+        copyToClipBoard(text) {
+            navigator.clipboard.writeText(text);
         },
     }
 }

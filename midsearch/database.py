@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 import numpy as np
 import sqlalchemy
 import datetime
+from langchain.embeddings.openai import OpenAIEmbeddings
 from sqlalchemy.orm import declarative_base, Session
 from pgvector.sqlalchemy import Vector
 
+embeddings = OpenAIEmbeddings()
 
 Base = declarative_base()
 
@@ -68,9 +70,6 @@ class PGVector:
         # create tables if not exists
         Base.metadata.create_all(self.engine)
 
-    # def drop_all(self):
-    #     Base.metadata.drop_all(self.engine)
-
     def add_document(self, document: Tuple[Document, List[Chunk]]):
         with Session(self.engine) as session:
             session.execute('SET CONSTRAINTS ALL DEFERRED')
@@ -86,17 +85,6 @@ class PGVector:
             session.query(Document).filter_by(id=id).delete()
             session.commit()
 
-    # def get_document(self, name: str) -> Optional[Document]:
-    #     with Session(self.engine) as session:
-    #         document = session.query(DocumentEmbedding).get(name)
-    #         if document is None:
-    #             return None
-    #         return Document(
-    #             name=document.name,
-    #             content=document.content,
-    #             embedding=document.embedding,
-    #         )
-
     def get_documents(self, n: int, offset: int = 0) -> List[Tuple[Document, List[Chunk]]]:
         with Session(self.engine) as session:
             documents = session.query(Document).limit(n).offset(offset).all()
@@ -111,18 +99,11 @@ class PGVector:
         with Session(self.engine) as session:
             return session.query(Document).count()
 
-    # def search_documents(self, embedding: np.ndarray, k: int) -> List[Document]:
-    #     with Session(self.engine) as session:
-    #         results = session.query(DocumentEmbedding, DocumentEmbedding.embedding.l2_distance(embedding).label("distance")).order_by(
-    #             sqlalchemy.asc("distance")).limit(k).all()
-    #         return [
-    #             Document(
-    #                 name=results.DocumentEmbedding.name,
-    #                 content=results.DocumentEmbedding.content,
-    #                 embedding=results.DocumentEmbedding.embedding,
-    #             )
-    #             for results in results
-    #         ]
+    def search_documents(self, query: str, k: int = 5) -> List[Chunk]:
+        with Session(self.engine) as session:
+            embedding = np.asarray(embeddings.embed_documents([query])[0])
+            return session.query(Chunk, Chunk.embedding.l2_distance(embedding).label("distance")).order_by(
+                sqlalchemy.asc("distance")).limit(k).all()
 
     def add_conversation(self, conversation: Conversation):
         with Session(self.engine) as session:

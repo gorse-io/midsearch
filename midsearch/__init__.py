@@ -21,13 +21,10 @@ from langchain.chat_models import ChatOpenAI
 import mistune
 from midsearch.database import PGVector, Conversation
 import os
-from midsearch.docutils import create_markdown_document
+from midsearch.docutils import create_markdown_document, count_tokens
+from langchain.prompts import load_prompt
+from langchain.schema import HumanMessage
 
-
-embeddings = OpenAIEmbeddings()
-db = Chroma(persist_directory='conchdb/data', embedding_function=embeddings)
-retriever = VectorStoreRetriever(vectorstore=db)
-qa = RetrievalQA.from_llm(llm=ChatOpenAI(temperature=0.1), retriever=retriever)
 
 pg = PGVector(os.environ['POSTGRES_URL'])
 
@@ -37,12 +34,13 @@ app = Flask(__name__)
 @app.route("/api/search/")
 def search():
     query = request.args.get('query')
-    docs = retriever.get_relevant_documents(query)
+    chunks = pg.search_documents(query)
     results = []
-    for doc in docs:
+    for chunk, score in chunks:
         results.append({
-            'page_content': mistune.html(doc.page_content),
-            'metadata': doc.metadata,
+            'page_content': mistune.html(chunk.content),
+            'token_count': count_tokens(chunk.content),
+            'score': score,
         })
     return jsonify(results)
 
@@ -50,7 +48,14 @@ def search():
 @app.route("/api/chat/")
 def chat():
     question = request.args.get('message')
-    answer = qa.run(question)
+    # Search revelevant documents
+    chunks = pg.search_documents(question)
+    context = '\n\n'.join([chunk.content for chunk, _ in chunks])
+    # Create prompt
+    template = load_prompt('lc://prompts/qa/stuff/basic.yaml')
+    prompt = template.format(context=context, question=question)
+    chat = ChatOpenAI(temperature=0)
+    answer = chat([HumanMessage(content=prompt)]).content
     pg.add_conversation(Conversation(question=question, answer=answer))
     return mistune.html(answer)
 
@@ -97,6 +102,7 @@ def get_documents():
         'updated_at': document[0].updated_at,
         'chunks': [{
             'content': mistune.html(chunk.content),
+            'token_count': count_tokens(chunk.content),
         } for chunk in document[1]],
     } for document in documents])
 
