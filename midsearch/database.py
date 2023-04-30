@@ -112,7 +112,7 @@ class PGVector:
 
     def get_conversations(self, n: int, offset: int = 0) -> List[Conversation]:
         with Session(self.engine) as session:
-            return session.query(Conversation).limit(
+            return session.query(Conversation).order_by(Conversation.id.desc()).limit(
                 n).offset(offset).all()
 
     def update_conversation(self, id: int, helpful: bool):
