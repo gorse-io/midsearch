@@ -56,7 +56,7 @@ def chat():
     prompt = template.format(context=context, question=question)
     chat = ChatOpenAI(temperature=0)
     answer = chat([HumanMessage(content=prompt)]).content
-    pg.add_conversation(Conversation(question=question, answer=answer))
+    pg.add_conversation(Conversation(question=question, answer=answer, prompt=prompt))
     return mistune.html(answer)
 
 
@@ -69,7 +69,7 @@ def get_conversations():
         'id': conversation.id,
         'question': conversation.question,
         'answer': mistune.html(conversation.answer),
-        'promppt': conversation.promppt,
+        'prompt': mistune.html(conversation.prompt),
         'helpful': conversation.helpful,
         'timestamp': conversation.timestamp,
     } for conversation in conversations])
@@ -84,6 +84,12 @@ def count_conversations():
 def update_conversation(id: int):
     helpful = request.form.get('helpful')
     pg.update_conversation(id=id, helpful=(helpful == 'true'))
+    return jsonify({'success': True})
+
+
+@app.route("/api/conversation/<id>", methods=['DELETE'])
+def delete_conversation(id: int):
+    pg.delete_conversation(id=id)
     return jsonify({'success': True})
 
 

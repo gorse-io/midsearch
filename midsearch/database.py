@@ -50,7 +50,7 @@ class Conversation(Base):
         sqlalchemy.Integer, primary_key=True, autoincrement=True)
     question = sqlalchemy.Column(sqlalchemy.String)
     answer = sqlalchemy.Column(sqlalchemy.String)
-    promppt = sqlalchemy.Column(sqlalchemy.String)
+    prompt = sqlalchemy.Column(sqlalchemy.String)
     helpful = sqlalchemy.Column(sqlalchemy.Boolean)
     timestamp = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.utcnow)
@@ -119,6 +119,11 @@ class PGVector:
         with Session(self.engine) as session:
             session.query(Conversation).filter_by(id=id).update(
                 {Conversation.helpful: helpful})
+            session.commit()
+
+    def delete_conversation(self, id: int):
+        with Session(self.engine) as session:
+            session.query(Conversation).filter_by(id=id).delete()
             session.commit()
 
     def count_conversations(self) -> int:

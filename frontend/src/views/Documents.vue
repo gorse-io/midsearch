@@ -40,7 +40,8 @@
             </v-col>
         </v-row>
         <v-row class="justify-center">
-            <v-pagination :length="page_count" :total-visible="7" rounded="circle"></v-pagination>
+            <v-pagination v-model="page_num" :length="page_count" :total-visible="7" rounded="circle"
+                @click="pageChange"></v-pagination>
         </v-row>
     </v-container>
 </template>
@@ -54,6 +55,7 @@ export default {
         return {
             documents: [],
             page_count: 0,
+            page_num: 1,
         }
     },
     mounted() {
@@ -99,6 +101,20 @@ export default {
                     console.log(error)
                 })
         },
+        pageChange: function () {
+            axios.get('/api/documents/', {
+                params: {
+                    n: 20,
+                    offset: (this.page_num - 1) * 20,
+                }
+            })
+                .then(response => {
+                    this.documents = response.data
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        }
     }
 }
 </script>
