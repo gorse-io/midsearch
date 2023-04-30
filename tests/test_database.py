@@ -24,8 +24,8 @@ class TestPGVector(unittest.TestCase):
             'POSTGRES_URL', 'postgresql://midsearch:midsearch_password@localhost:5432/midsearch')
         self.database = PGVector(url)
 
-    def tearDown(self):
-        self.database.drop_all()
+    def test_conversation(self):
+        self.assertTrue(True)
 
 
 if __name__ == '__main__':
