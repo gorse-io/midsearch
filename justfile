@@ -7,3 +7,6 @@ debug-frontend:
 
 debug-backend:
     flask run
+
+debug-telegram:
+    python3 midsearch telegram

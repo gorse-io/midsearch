@@ -43,7 +43,11 @@ def search():
 
 @app.route("/api/chat/")
 def chat():
+    # Get question
     question = request.args.get('message')
+    # Get accept MIME type
+    mime_type = request.accept_mimetypes.best_match(
+        ['text/html', 'text/markdown'])
     # Search revelevant documents
     chunks = pg.search_documents(question)
     context = '\n\n'.join([chunk.content for chunk, _ in chunks])
@@ -52,8 +56,15 @@ def chat():
     prompt = template.format(context=context, question=question)
     chat = ChatOpenAI(temperature=0)
     answer = chat([HumanMessage(content=prompt)]).content
-    pg.add_conversation(Conversation(question=question, answer=answer, prompt=prompt))
-    return mistune.html(answer)
+    pg.add_conversation(Conversation(
+        question=question, answer=answer, prompt=prompt))
+    # Render answer
+    if mime_type == 'text/markdown':
+        return answer
+    elif mime_type == 'text/html':
+        return mistune.html(answer)
+    else:
+        return f"unsupported accept MIME type: {mime_type}", 400
 
 
 @app.route("/api/conversations/", methods=['GET'])
