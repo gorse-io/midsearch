@@ -20,8 +20,7 @@ import openai.error
 from flask import Flask, jsonify, request
 from flask_login import LoginManager, UserMixin, login_user
 from langchain.chat_models import ChatOpenAI
-from langchain.prompts import load_prompt
-from langchain.schema import HumanMessage, Document
+from langchain.schema import Document
 from langchain.chains.question_answering import load_qa_chain
 
 from midsearch.database import PGVector, Conversation
@@ -29,6 +28,8 @@ from midsearch.docutils import create_markdown_document, count_tokens
 
 # Load gloabl config
 MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 4096))
+USERNAME = os.getenv('MIDSEARCH_USERNAME')
+PASSWORD = os.getenv('MIDSEARCH_PASSWORD')
 
 pg = PGVector(os.environ['POSTGRES_URL'])
 
