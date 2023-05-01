@@ -29,6 +29,7 @@ class Document(Base):
     __tablename__ = "document"
 
     id = sqlalchemy.Column(sqlalchemy.String, primary_key=True)
+    md5 = sqlalchemy.Column(sqlalchemy.String)
     updated_at = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.utcnow)
 
@@ -94,6 +95,10 @@ class PGVector:
                     doc_id=document.id).all()
                 results.append((document, chunks))
             return results
+
+    def get_document(self, id: str) -> Document:
+        with Session(self.engine) as session:
+            return session.query(Document).filter_by(id=id).first()
 
     def count_documents(self) -> int:
         with Session(self.engine) as session:

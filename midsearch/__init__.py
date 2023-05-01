@@ -16,6 +16,7 @@ from flask_login import LoginManager, UserMixin, login_user
 from flask import Flask, jsonify, request
 from langchain.chat_models import ChatOpenAI
 import mistune
+import hashlib
 from midsearch.database import PGVector, Conversation
 import os
 from midsearch.docutils import create_markdown_document, count_tokens
@@ -83,7 +84,7 @@ def chat():
     # Create prompt
     template = load_prompt('lc://prompts/qa/stuff/basic.yaml')
     prompt = template.format(context=context, question=question)
-    chat = ChatOpenAI(temperature=0)
+    chat = ChatOpenAI()
     answer = chat([HumanMessage(content=prompt)]).content
     pg.add_conversation(Conversation(
         question=question, answer=answer, prompt=prompt))
@@ -152,6 +153,13 @@ def get_documents():
 @app.route("/api/document/<string:id>", methods=['POST'])
 def update_document(id: str):
     content = request.form.get('content')
+    # check if document exists
+    exists = pg.get_document(id)
+    if exists:
+        md5 = hashlib.md5(content.encode('utf-8')).hexdigest()
+        if exists.md5 == md5:
+            return jsonify({'success': True})
+    # create document if it doesn't exist
     document = create_markdown_document(id, content)
     pg.add_document(document)
     return jsonify({'success': True})

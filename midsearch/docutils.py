@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from midsearch.database import Document, Chunk
 from langchain.text_splitter import MarkdownTextSplitter
+import hashlib
 from langchain.embeddings.openai import OpenAIEmbeddings
 import tiktoken
 
@@ -12,8 +13,8 @@ def count_tokens(text: str) -> int:
     return len(encoding.encode(text))
 
 
-def create_document(id: str, chunks: List[str]) -> Tuple[Document, List[Chunk]]:
-    document = Document(id=id)
+def create_document(id: str, md5: str, chunks: List[str]) -> Tuple[Document, List[Chunk]]:
+    document = Document(id=id, md5=md5)
     chunk_embeddings = []
     for chunk in chunks:
         chunk_embeddings.append(
@@ -22,6 +23,7 @@ def create_document(id: str, chunks: List[str]) -> Tuple[Document, List[Chunk]]:
 
 
 def create_markdown_document(id: str, content: str) -> Tuple[Document, List[Chunk]]:
+    md5 = hashlib.md5(content.encode('utf-8')).hexdigest()
     splitter = MarkdownTextSplitter()
     chunks = splitter.split_text(content)
-    return create_document(id=id, chunks=chunks)
+    return create_document(id=id, md5=md5, chunks=chunks)
