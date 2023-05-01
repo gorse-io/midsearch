@@ -5,6 +5,7 @@ mistune==2.0.4
 openai==0.27.4
 pgvector==0.1.6
 psycopg2-binary==2.9.6
+python-telegram-bot==20.2
 SQLAlchemy==2.0.9
 tiktoken==0.3.3
 waitress==2.1.2

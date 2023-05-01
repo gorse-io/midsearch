@@ -19,5 +19,12 @@ services:
       POSTGRES_URL: postgresql://midsearch:midsearch_password@pgvector:5432/midsearch
       OPENAI_API_KEY: ${OPENAI_API_KEY}
 
+  telegram-bot:
+    build: .
+    environment:
+      MIDSEARCH_ENDPOINT: http://midsearch:5000/api/
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    command: python3 midsearch telegram
+
 volumes:
   postgres_data:

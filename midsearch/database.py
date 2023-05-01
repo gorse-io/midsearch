@@ -111,10 +111,11 @@ class PGVector:
             return session.query(Chunk, Chunk.embedding.l2_distance(embedding).label("distance")).order_by(
                 sqlalchemy.asc("distance")).limit(k).all()
 
-    def add_conversation(self, conversation: Conversation):
+    def add_conversation(self, conversation: Conversation) -> int:
         with Session(self.engine) as session:
             session.add(conversation)
             session.commit()
+            return conversation.id
 
     def get_conversations(self, n: int, offset: int = 0) -> List[Conversation]:
         with Session(self.engine) as session:
