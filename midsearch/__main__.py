@@ -12,11 +12,14 @@ load_dotenv()
 
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    reply = requests.get(
+    r = requests.get(
         "http://localhost:5000/api/chat",
         params={'message': update.message.text},
-        headers={'Accept': 'text/markdown'}).text
-    await update.message.reply_markdown(reply)
+        headers={'Accept': 'text/markdown'})
+    if r.status_code == 200:
+        await update.message.reply_markdown(r.text)
+    else:
+        await update.message.reply_text(r.text)
 
 
 @click.group()

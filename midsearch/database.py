@@ -107,7 +107,7 @@ class PGVector:
 
     def search_documents(self, query: str, k: int = 5) -> List[Chunk]:
         with Session(self.engine) as session:
-            embedding = np.asarray(embeddings.embed_documents([query])[0])
+            embedding = np.asarray(embeddings.embed_query(query))
             return session.query(Chunk, Chunk.embedding.l2_distance(embedding).label("distance")).order_by(
                 sqlalchemy.asc("distance")).limit(k).all()
 

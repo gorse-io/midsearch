@@ -16,18 +16,34 @@ import hashlib
 import os
 
 import mistune
+import openai.error
 from flask import Flask, jsonify, request
 from flask_login import LoginManager, UserMixin, login_user
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import load_prompt
-from langchain.schema import HumanMessage
+from langchain.schema import HumanMessage, Document
+from langchain.chains.question_answering import load_qa_chain
 
 from midsearch.database import PGVector, Conversation
 from midsearch.docutils import create_markdown_document, count_tokens
 
+# Load gloabl config
+MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 4096))
+
 pg = PGVector(os.environ['POSTGRES_URL'])
 
 app = Flask(__name__, static_folder="./static", static_url_path="/")
+
+
+# Add error handlers
+
+@app.errorhandler(openai.error.InvalidRequestError)
+def handle_invalid_request(e):
+    return str(e), 500
+
+
+app.register_error_handler(400, handle_invalid_request)
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -80,12 +96,19 @@ def chat():
         ['text/html', 'text/markdown'])
     # Search revelevant documents
     chunks = pg.search_documents(question)
-    context = '\n\n'.join([chunk.content for chunk, _ in chunks])
+    prompt = ''.join([chunk.content for chunk, _ in chunks])
+    docs = []
+    length = 0
+    for chunk, _ in chunks:
+        token_count = count_tokens(chunk.content)
+        if length + token_count > MAX_CONTEXT_LENGTH:
+            break
+        docs.append(Document(page_content=chunk.content))
+        length += token_count
     # Create prompt
-    template = load_prompt('lc://prompts/qa/stuff/basic.yaml')
-    prompt = template.format(context=context, question=question)
     chat = ChatOpenAI()
-    answer = chat([HumanMessage(content=prompt)]).content
+    chain = load_qa_chain(chat, chain_type="stuff")
+    answer = chain.run(input_documents=docs, question=question)
     pg.add_conversation(Conversation(
         question=question, answer=answer, prompt=prompt))
     # Render answer
