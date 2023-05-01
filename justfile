@@ -18,3 +18,6 @@ debug-telegram:
 
 debug-discord:
     python3 midsearch discord
+
+debug-wechat:
+    python3 midsearch wechat

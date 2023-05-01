@@ -1,17 +1,35 @@
+from wechaty import Wechaty, Message, MessageType
+from tqdm import tqdm
+from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from langchain.chat_models import ChatOpenAI
+from langchain.schema import HumanMessage, AIMessage
+import openai
+import requests
+import click
+import asyncio
 import glob
 import os
 
-import click
-import requests
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from tqdm import tqdm
+openai.proxy = {}
+# openai.proxy['http'] = 'http://127.0.0.1:7890'
+# openai.proxy['https'] = 'socks5://127.0.0.1:8234'
+chat = ChatOpenAI()
 
 
 ENDPOINT = os.getenv('MIDSEARCH_ENDPOINT', 'http://localhost:5000/api/')
 
 
-async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+@click.group()
+def cli():
+    pass
+
+################
+# Telegram Bot #
+################
+
+
+async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     r = requests.get(
         f"{ENDPOINT}chat",
         params={'message': update.message.text},
@@ -27,23 +45,44 @@ async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(r.text)
 
 
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def telegram_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     await query.answer()
 
 
-@click.group()
-def cli():
-    pass
-
-
 @cli.command()
 def telegram():
     app = ApplicationBuilder().token(os.environ['TELEGRAM_BOT_TOKEN']).build()
-    app.add_handler(MessageHandler(filters.TEXT, hello))
-    app.add_handler(CallbackQueryHandler(button))
+    app.add_handler(MessageHandler(filters.TEXT, telegram_handler))
+    app.add_handler(CallbackQueryHandler(telegram_button))
     app.run_polling()
+
+
+##############
+# WeChat Bot #
+##############
+
+async def message_handler(message: Message):
+    if message.type() == MessageType.MESSAGE_TYPE_TEXT:
+        print(message.text())
+        r = chat([HumanMessage(content=message.text())])
+        print(r)
+        await message.say(message.text())
+
+
+async def wechaty_main():
+    bot = Wechaty()
+    bot.on('scan', lambda status, qrcode, data: print(
+        'Scan QR Code to login: {}\nhttps://wechaty.wechaty.js/qrcode/{}'.format(status, qrcode)))
+    bot.on('login', lambda user: print('User {} logged in'.format(user)))
+    bot.on('message', message_handler)
+    await bot.start()
+
+
+@cli.command()
+def wechat():
+    asyncio.run(wechaty_main())
 
 
 @cli.command()
