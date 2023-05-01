@@ -12,22 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask_login import LoginManager, UserMixin, login_user
-from flask import Flask, jsonify, request
-from langchain.chat_models import ChatOpenAI
-import mistune
 import hashlib
-from midsearch.database import PGVector, Conversation
 import os
-from midsearch.docutils import create_markdown_document, count_tokens
+
+import mistune
+from flask import Flask, jsonify, request
+from flask_login import LoginManager, UserMixin, login_user
+from langchain.chat_models import ChatOpenAI
 from langchain.prompts import load_prompt
 from langchain.schema import HumanMessage
 
+from midsearch.database import PGVector, Conversation
+from midsearch.docutils import create_markdown_document, count_tokens
 
 pg = PGVector(os.environ['POSTGRES_URL'])
 
 app = Flask(__name__, static_folder="./static", static_url_path="/")
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)

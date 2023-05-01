@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 from typing import List, Tuple
+
 import numpy as np
 import sqlalchemy
-import datetime
 from langchain.embeddings.openai import OpenAIEmbeddings
-from sqlalchemy.orm import declarative_base, Session
 from pgvector.sqlalchemy import Vector
+from sqlalchemy.orm import declarative_base, Session
 
 embeddings = OpenAIEmbeddings()
 

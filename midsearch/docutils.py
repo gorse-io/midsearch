@@ -1,9 +1,11 @@
-from typing import List, Tuple
-from midsearch.database import Document, Chunk
-from langchain.text_splitter import MarkdownTextSplitter
 import hashlib
-from langchain.embeddings.openai import OpenAIEmbeddings
+from typing import List, Tuple
+
 import tiktoken
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.text_splitter import MarkdownTextSplitter
+
+from midsearch.database import Document, Chunk
 
 encoding = tiktoken.get_encoding("cl100k_base")
 embeddings = OpenAIEmbeddings()

@@ -1,12 +1,12 @@
-import click
-import os
 import glob
-from tqdm import tqdm
-from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
+import os
+
+import click
 import requests
 from dotenv import load_dotenv
-
+from telegram import Update
+from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
+from tqdm import tqdm
 
 load_dotenv()
 
