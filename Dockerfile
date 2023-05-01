@@ -9,7 +9,19 @@ WORKDIR /frontend
 
 RUN yarn install && yarn build
 
-# FROM python:3.11
+#################################
+# STEP 2 setup python environment
+#################################
+FROM python:3.11
 
-# # Install dependencies
-# RUN pip install -r requirements.txt
+COPY ./midsearch /midsearch
+
+COPY --from=0 /frontend/dist /midsearch/static
+
+COPY requirements.txt /
+
+WORKDIR /
+
+RUN pip install -r requirements.txt
+
+CMD waitress-serve --host 0.0.0.0 --port 5000 midsearch:app

@@ -1,18 +1,19 @@
 <template>
-  <v-app>
-    <v-navigation-drawer app permanent>
-      <v-list density="compact" nav>
-        <v-list-item v-for="item in items" :key="item.title" :prepend-icon="item.icon" :title="item.title" :to="item.link"></v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+    <v-app>
+        <v-navigation-drawer app permanent v-if="$route.name != 'Login'">
+            <v-list density="compact" nav>
+                <v-list-item v-for="item in items" :key="item.title" :prepend-icon="item.icon" :title="item.title"
+                    :to="item.link"></v-list-item>
+            </v-list>
+        </v-navigation-drawer>
 
-    <v-app-bar app color="primary" dark>
-    </v-app-bar>
+        <v-app-bar app color="primary" dark>
+        </v-app-bar>
 
-    <v-main>
-      <router-view></router-view>
-    </v-main>
-  </v-app>
+        <v-main>
+            <router-view></router-view>
+        </v-main>
+    </v-app>
 </template>
 
 <script>

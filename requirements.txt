@@ -7,3 +7,4 @@ pgvector==0.1.6
 psycopg2-binary==2.9.6
 SQLAlchemy==2.0.9
 tiktoken==0.3.3
+waitress==2.1.2

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from flask_login import LoginManager, UserMixin, login_user
 from flask import Flask, jsonify, request
 from langchain.chat_models import ChatOpenAI
 import mistune
@@ -24,7 +25,35 @@ from langchain.schema import HumanMessage
 
 pg = PGVector(os.environ['POSTGRES_URL'])
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="./static", static_url_path="/")
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id == os.getenv('MIDSEARCH_USERNAME'):
+        return UserMixin()
+    return None
+
+
+@app.route("/")
+def index():
+    return app.send_static_file("index.html")
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    if username == os.getenv('MIDSEARCH_USERNAME') and password == os.getenv('MIDSEARCH_PASSWORD'):
+        user = UserMixin()
+        login_user(user)
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False})
 
 
 @app.route("/api/search/")

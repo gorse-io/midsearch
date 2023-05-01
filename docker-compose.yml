@@ -1,15 +1,23 @@
 version: "3"
 services:
-   pgvector:
-     image: ankane/pgvector
-     ports:
-       - 5432:5432
-     environment:
-       POSTGRES_DB: midsearch
-       POSTGRES_USER: midsearch
-       POSTGRES_PASSWORD: midsearch_password
-     volumes:
-       - postgres_data:/var/lib/postgresql/data
+  pgvector:
+    image: ankane/pgvector
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: midsearch
+      POSTGRES_USER: midsearch
+      POSTGRES_PASSWORD: midsearch_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  midsearch:
+    build: .
+    ports:
+      - 5000:5000
+    environment:
+      POSTGRES_URL: postgresql://midsearch:midsearch_password@pgvector:5432/midsearch
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
 
 volumes:
-   postgres_data:
+  postgres_data:
