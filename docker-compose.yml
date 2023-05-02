@@ -14,7 +14,7 @@ services:
   midsearch:
     build: .
     ports:
-      - 5000:5000
+      - 8080:8080
     environment:
       POSTGRES_URL: postgresql://midsearch:midsearch_password@pgvector:5432/midsearch
       OPENAI_API_KEY: ${OPENAI_API_KEY}
@@ -26,16 +26,17 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
     command: python3 midsearch telegram
 
-  wechaty:
-    image: wechaty/wechaty:0.65
-    environment:
-      WECHATY_LOG: verbose
-      WECHATY_PUPPET: wechaty-puppet-padlocal
-      WECHATY_PUPPET_PADLOCAL_TOKEN: ${WECHATY_PUPPET_PADLOCAL_TOKEN}
-      WECHATY_PUPPET_SERVER_PORT: 8080
-      WECHATY_TOKEN: ${WECHATY_TOKEN}
-    ports:
-      - 8080:8080
+  # Uncomment to enable WeChaty
+  # wechaty:
+  #   image: wechaty/wechaty:0.65
+  #   environment:
+  #     WECHATY_LOG: verbose
+  #     WECHATY_PUPPET: wechaty-puppet-padlocal
+  #     WECHATY_PUPPET_PADLOCAL_TOKEN: ${WECHATY_PUPPET_PADLOCAL_TOKEN}
+  #     WECHATY_PUPPET_SERVER_PORT: 8080
+  #     WECHATY_TOKEN: ${WECHATY_TOKEN}
+  #   ports:
+  #     - 8080:8080
 
 volumes:
   postgres_data:
