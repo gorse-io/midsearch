@@ -1,9 +1,11 @@
+from langchain.schema import HumanMessage, AIMessage
+from langchain.chat_models import ChatOpenAI
 from wechaty import Wechaty, Message, MessageType
 from tqdm import tqdm
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import HumanMessage, AIMessage
+
+import discord
 import openai
 import requests
 import click
@@ -11,9 +13,11 @@ import asyncio
 import glob
 import os
 
-openai.proxy = {}
+# openai.proxy = {}
 # openai.proxy['http'] = 'http://127.0.0.1:7890'
-# openai.proxy['https'] = 'socks5://127.0.0.1:8234'
+# openai.proxy['https'] = 'http://127.0.0.1:7890'
+openai.proxy = 'http://192.168.101.22:7890'
+
 chat = ChatOpenAI()
 
 
@@ -59,16 +63,33 @@ def telegram():
     app.run_polling()
 
 
+###############
+# Discord Bot #
+###############
+
+intents = discord.Intents.default()
+intents.message_content = True
+client = discord.Client(intents=intents)
+
+
+@client.event
+async def on_ready():
+    print(f'{client.user} has connected to Discord!')
+
+
+@cli.command()
+def discord():
+    client.run(os.getenv('DISCORD_BOT_TOKEN'))
+
+
 ##############
 # WeChat Bot #
 ##############
 
 async def message_handler(message: Message):
     if message.type() == MessageType.MESSAGE_TYPE_TEXT:
-        print(message.text())
         r = chat([HumanMessage(content=message.text())])
-        print(r)
-        await message.say(message.text())
+        await message.say(r.content)
 
 
 async def wechaty_main():
