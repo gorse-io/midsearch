@@ -14,10 +14,11 @@
 
 import hashlib
 import os
+from functools import wraps
 
 import mistune
 import openai.error
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_login import LoginManager, UserMixin, login_user
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import Document
@@ -30,6 +31,20 @@ from midsearch.docutils import create_markdown_document, count_tokens
 MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 4096))
 USERNAME = os.getenv('MIDSEARCH_USERNAME')
 PASSWORD = os.getenv('MIDSEARCH_PASSWORD')
+API_KEY = os.getenv('MIDSEARCH_API_KEY')
+
+
+def key_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        token = ''
+        if 'X-Api-Key' in request.headers:
+            token = request.headers['x-access-token']
+        if API_KEY != '' and token != API_KEY:
+            return make_response('invalid api key', 401)
+        return f(*args, **kwargs)
+    return decorator
+
 
 pg = PGVector(os.environ['POSTGRES_URL'])
 
