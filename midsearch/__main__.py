@@ -19,12 +19,14 @@ from tqdm import tqdm
 from telegram.constants import MessageEntityType
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from discord.ui import Button, View
 import discord
 import click
 import requests
 
 
 ENDPOINT = os.getenv('MIDSEARCH_ENDPOINT', 'http://localhost:8080/api/')
+API_KEY = os.getenv('MIDSEARCH_API_KEY')
 
 
 @click.group()
@@ -43,7 +45,7 @@ async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     r = requests.get(
         f"{ENDPOINT}chat",
         params={'message': update.message.text},
-        headers={'Accept': 'text/markdown'})
+        headers={'Accept': 'text/markdown', 'X-Api-Key': API_KEY})
     if r.status_code == 200:
         keyboard = [[
             InlineKeyboardButton("\U0001F44D", callback_data="1"),
@@ -84,13 +86,16 @@ async def on_ready():
 
 @client.event
 async def on_message(message: discord.Message):
-    if message.author == client.user:
+    if message.author == client.user or message.content == '':
         return
     r = requests.get(
         f"{ENDPOINT}chat",
         params={'message': message.content},
-        headers={'Accept': 'text/markdown'})
-    await message.channel.send(r.text)
+        headers={'Accept': 'text/markdown', 'X-Api-Key': API_KEY})
+    view = View()
+    view.add_item(Button(label='\U0001F44D'))
+    view.add_item(Button(label='\U0001F44E'))
+    await message.channel.send(r.text, view=view)
 
 
 @cli.command()

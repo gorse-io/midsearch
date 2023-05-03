@@ -18,6 +18,7 @@ services:
     environment:
       POSTGRES_URL: postgresql://midsearch:midsearch_password@pgvector:5432/midsearch
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
 
   telegram-bot:
     build: .
@@ -32,7 +33,6 @@ services:
       MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
       DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
     command: python3 midsearch discord
-
   # Uncomment to enable WeChaty
   # wechaty:
   #   image: wechaty/wechaty:0.65

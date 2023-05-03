@@ -39,7 +39,7 @@ def key_required(f):
     def decorator(*args, **kwargs):
         token = ''
         if 'X-Api-Key' in request.headers:
-            token = request.headers['x-access-token']
+            token = request.headers['X-Api-Key']
         if API_KEY != '' and token != API_KEY:
             return make_response('invalid api key', 401)
         return f(*args, **kwargs)
@@ -104,6 +104,7 @@ def search():
 
 
 @app.route("/api/chat/")
+@key_required
 def chat():
     # Get question
     question = request.args.get('message')
