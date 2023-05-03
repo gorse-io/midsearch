@@ -2,6 +2,7 @@ click==8.0.4
 discord.py==2.2.3
 flask==2.2.3
 Flask-Login==0.6.0
+Flask-Login==0.6.0
 langchain==0.0.153
 mistune==2.0.4
 openai==0.27.4

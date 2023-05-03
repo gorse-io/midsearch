@@ -22,9 +22,16 @@ services:
   telegram-bot:
     build: .
     environment:
-      MIDSEARCH_ENDPOINT: http://midsearch:5000/api/
+      MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
     command: python3 midsearch telegram
+
+  discord-bot:
+    build: .
+    environment:
+      MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+    command: python3 midsearch discord
 
   # Uncomment to enable WeChaty
   # wechaty:

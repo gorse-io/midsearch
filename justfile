@@ -7,17 +7,17 @@ export POSTGRES_URL := "postgresql://midsearch:midsearch_password@localhost:5432
 stop-backend:
     docker-compose stop midsearch
 
+stop-telegram-bot:
+    docker-compose stop telegram-bot
+
 debug-frontend:
     cd frontend && yarn dev
 
 debug-backend: stop-backend
     flask run
 
-debug-telegram:
+debug-telegram-bot: stop-telegram-bot
     python3 midsearch telegram
 
-debug-discord:
+debug-discord-bot:
     python3 midsearch discord
-
-debug-wechat:
-    python3 midsearch wechat

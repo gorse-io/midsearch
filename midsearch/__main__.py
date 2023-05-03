@@ -1,27 +1,30 @@
-from langchain.schema import HumanMessage, AIMessage
-from langchain.chat_models import ChatOpenAI
-from wechaty import Wechaty, Message, MessageType
-from tqdm import tqdm
-from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+# Copyright 2023 MidSearch Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import discord
-import openai
-import requests
-import click
-import asyncio
 import glob
 import os
 
-# openai.proxy = {}
-# openai.proxy['http'] = 'http://127.0.0.1:7890'
-# openai.proxy['https'] = 'http://127.0.0.1:7890'
-openai.proxy = 'http://192.168.101.22:7890'
+from tqdm import tqdm
+from telegram.constants import MessageEntityType
+from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+import discord
+import click
+import requests
 
-chat = ChatOpenAI()
 
-
-ENDPOINT = os.getenv('MIDSEARCH_ENDPOINT', 'http://localhost:5000/api/')
+ENDPOINT = os.getenv('MIDSEARCH_ENDPOINT', 'http://localhost:8080/api/')
 
 
 @click.group()
@@ -34,6 +37,9 @@ def cli():
 
 
 async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.message.chat.type != 'private' and (
+            update.message.entities is None or len(update.message.entities) == 0 or update.message.entities[0].type != MessageEntityType.MENTION):
+        return
     r = requests.get(
         f"{ENDPOINT}chat",
         params={'message': update.message.text},
@@ -68,7 +74,6 @@ def telegram():
 ###############
 
 intents = discord.Intents.default()
-intents.message_content = True
 client = discord.Client(intents=intents)
 
 
@@ -77,33 +82,20 @@ async def on_ready():
     print(f'{client.user} has connected to Discord!')
 
 
+@client.event
+async def on_message(message: discord.Message):
+    if message.author == client.user:
+        return
+    r = requests.get(
+        f"{ENDPOINT}chat",
+        params={'message': message.content},
+        headers={'Accept': 'text/markdown'})
+    await message.channel.send(r.text)
+
+
 @cli.command()
 def discord():
     client.run(os.getenv('DISCORD_BOT_TOKEN'))
-
-
-##############
-# WeChat Bot #
-##############
-
-async def message_handler(message: Message):
-    if message.type() == MessageType.MESSAGE_TYPE_TEXT:
-        r = chat([HumanMessage(content=message.text())])
-        await message.say(r.content)
-
-
-async def wechaty_main():
-    bot = Wechaty()
-    bot.on('scan', lambda status, qrcode, data: print(
-        'Scan QR Code to login: {}\nhttps://wechaty.wechaty.js/qrcode/{}'.format(status, qrcode)))
-    bot.on('login', lambda user: print('User {} logged in'.format(user)))
-    bot.on('message', message_handler)
-    await bot.start()
-
-
-@cli.command()
-def wechat():
-    asyncio.run(wechaty_main())
 
 
 @cli.command()
