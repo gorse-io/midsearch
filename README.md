@@ -1,6 +1,8 @@
 # MidSearch
 
-<center><img width=400 src="./assets/midsearch.png"></center>
+<p align="center">
+<img width=400 src="./assets/midsearch.png">
+</p>
 
 MidSearch is a middleware to connect chat bots to search engines. It gerenetes human friendly answers to user questions based on ingested documents. Besides its basic question answering ability, MidSearch also supports more advanced features:
 
