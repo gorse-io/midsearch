@@ -14,7 +14,7 @@ MidSearch is a middleware to connect chat bots to search engines. It gerenetes h
 - **Evaluation**: Users or administrators can rate the quality of answers to questions to track the quality of documents.
 - **Multi-platform**: MidSearch can be used by chat bots on different platforms, such as Telegram, Discord, etc.
 
-## Deployment
+## Deploy
 
 1. Clone the repository:
 
@@ -41,7 +41,21 @@ docker-compose up -d
 
 ## Usage
 
-### Ingest Documents
+### Add/Sync Documents
+
+1. Install the Python package:
+
+```bash
+pip install git+https://github.com/gorse-io/midsearch.git
+```
+
+2. Add documents:
+
+```bash
+midsearch add /path/to/documents
+```
+
+Markdown files in the directory will be ingested as documents. The file name will be used as the document id. The sync command is similar to the add command, except that it will delete documents that are not in the directory.
 
 ### Setup Telegram Bot
 

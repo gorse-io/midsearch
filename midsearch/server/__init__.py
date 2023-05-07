@@ -24,8 +24,8 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema import Document
 from langchain.chains.question_answering import load_qa_chain
 
-from midsearch.database import PGVector, Conversation
-from midsearch.docutils import create_markdown_document, count_tokens
+from midsearch.server.database import PGVector, Conversation
+from midsearch.server.docutils import create_markdown_document, count_tokens
 
 # Load gloabl config
 MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 4096))

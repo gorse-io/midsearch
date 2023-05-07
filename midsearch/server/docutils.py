@@ -19,7 +19,7 @@ import tiktoken
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import MarkdownTextSplitter
 
-from midsearch.database import Document, Chunk
+from midsearch.server.database import Document, Chunk
 
 encoding = tiktoken.get_encoding("cl100k_base")
 embeddings = OpenAIEmbeddings()

@@ -16,6 +16,7 @@ setup(name='midsearch',
           'python-dotenv==0.21.0',
           'python-telegram-bot==20.2'
       ],
+      scripts=['bin/midsearch'],
       long_description=long_description,
       long_description_content_type='text/markdown'
       )

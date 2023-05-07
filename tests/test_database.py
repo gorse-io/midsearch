@@ -14,7 +14,7 @@
 
 import unittest
 import os
-from midsearch.database import PGVector
+from midsearch.server.database import PGVector
 
 
 class TestPGVector(unittest.TestCase):
