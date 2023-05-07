@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 from telegram.constants import MessageEntityType
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
+from telegram.helpers import escape_markdown
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from discord.ui import Button, View
 import discord
@@ -94,7 +95,7 @@ async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             InlineKeyboardButton("\U0001F44E", callback_data="2"),
         ]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_markdown_v2(r.text, reply_markup=reply_markup)
+        await update.message.reply_markdown_v2(escape_markdown(r.text, version=2), reply_markup=reply_markup)
     else:
         await update.message.reply_text(r.text)
 
