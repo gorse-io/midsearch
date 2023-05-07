@@ -175,6 +175,14 @@ def count_documents():
     return jsonify(pg.count_documents())
 
 
+@app.route("/api/document/", methods=['DELETE'])
+@key_required
+def delete_document():
+    id = request.args.get('id')
+    pg.delete_document(id=id)
+    return jsonify({'success': True})
+
+
 @app.route("/api/documents/", methods=['GET'])
 def get_documents():
     offset = request.args.get('offset', 0)
@@ -190,8 +198,10 @@ def get_documents():
     } for document in documents])
 
 
-@app.route("/api/document/<string:id>", methods=['POST'])
-def update_document(id: str):
+@app.route("/api/document/", methods=['POST'])
+@key_required
+def update_document():
+    id = request.form.get('id')
     content = request.form.get('content')
     # check if document exists
     exists = pg.get_document(id)

@@ -74,7 +74,7 @@ class PGVector:
 
     def add_document(self, document: Tuple[Document, List[Chunk]]):
         with Session(self.engine) as session:
-            session.execute('SET CONSTRAINTS ALL DEFERRED')
+            session.execute(sqlalchemy.text('SET CONSTRAINTS ALL DEFERRED'))
             # delete existing document
             session.query(Document).filter_by(id=document[0].id).delete()
             # insert new document

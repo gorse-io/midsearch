@@ -20,7 +20,7 @@ debug-backend: stop-backend
     flask run
 
 debug-telegram-bot: stop-telegram-bot
-    python3 midsearch telegram
+    python3 midsearch/client telegram
 
 debug-discord-bot: stop-discord-bot
-    python3 midsearch discord
+    python3 midsearch/client discord

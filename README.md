@@ -1,18 +1,27 @@
 # MidSearch
 
 <p align="center">
-<img width=400 src="./assets/midsearch.png">
+<img width=500 src="./assets/midsearch.png">
 </p>
 
 [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/zhenghaoz/midsearch)](https://hub.docker.com/r/zhenghaoz/midsearch)
 [![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/zhenghaoz/midsearch)](https://hub.docker.com/r/zhenghaoz/midsearch)
 [![Docker Pulls](https://img.shields.io/docker/pulls/zhenghaoz/midsearch)](https://hub.docker.com/r/zhenghaoz/midsearch)
 
-MidSearch is a middleware to connect chat bots to search engines (Postgres). It gerenetes human friendly answers to user questions based on ingested documents. Besides its basic question answering ability, MidSearch also supports more advanced features:
+MidSearch is a middleware to connect chat bots to documents search (powered by Postgres). It gerenetes human friendly answers to user questions based on ingested documents. Besides its basic question answering ability, MidSearch also supports more advanced features:
 
 - **Observality**: Conversactions between users and chat bots are recorded and can be used to improve documents.
 - **Evaluation**: Users or administrators can rate the quality of answers to questions to track the quality of documents.
 - **Multi-platform**: MidSearch can be used by chat bots on different platforms, such as Telegram, Discord, etc.
+
+## Demos
+
+There are two demos of MidSearch:
+
+| Telegram Bot | Documents Source |
+|-|-|
+| [How to Cook Bot](https://t.me/how_to_cook_bot) | [Anduin2017/HowToCook](https://github.com/Anduin2017/HowToCook) |
+| [Gorse Support Bot](https://t.me/gorse_support_bot) | [https://github.com/gorse-io/docs](gorse-io/docs) |
 
 ## Deploy
 

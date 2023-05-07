@@ -9,7 +9,7 @@ long_description = (this_directory / "README.md").read_text()
 setup(name='midsearch',
       version='0.0.1',
       description='Python client for Midsearch',
-      packages=['midsearch'],
+      packages=['midsearch.client'],
       install_requires=[
           'click==8.0.4',
           'discord.py==2.2.3',

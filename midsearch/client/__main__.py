@@ -39,9 +39,17 @@ class Client:
         self.endpoint = endpoint
         self.api_key = api_key
 
-    def delete_document(self, document_id: str):
+    def add_document(self, id: str, content: str):
+        r = requests.post(
+            f"{self.endpoint}document/",
+            headers={'Accept': 'application/json', 'X-Api-Key': self.api_key},
+            data={'id': id, 'content': content})
+        r.raise_for_status()
+
+    def delete_document(self, id: str):
         r = requests.delete(
-            f"{self.endpoint}documents/{document_id}",
+            f"{self.endpoint}document/",
+            params={'id': id},
             headers={'Accept': 'application/json', 'X-Api-Key': self.api_key})
         r.raise_for_status()
 
@@ -141,43 +149,48 @@ def discord():
 
 @cli.command()
 @click.argument('dir')
-def sync(dir: str):
+@click.option('-v', '--verbose', is_flag=True)
+def sync(dir: str, verbose: bool = False):
     """Sync markdown files (Non-existing files will be deleted)."""
     client = Client(ENDPOINT, API_KEY)
     # List all documents in the server.
     existed_documents = {document['id']
                          for document in client.list_all_documents()}
     # List all documents in the local.
-    markdown_files = glob.glob(f'{dir}/*.md')
-    for file in tqdm(markdown_files, desc='Update documents'):
+    markdown_files = glob.glob(f'{dir}/**/*.md', recursive=True)
+    for file in tqdm(markdown_files, desc='Update documents', disable=verbose):
         file_name = file[len(dir):]
         if file_name.startswith('/'):
             file_name = file_name[1:]
+        if verbose:
+            print(f'Update {file_name}')
         with open(file) as f:
             content = ''.join(f.readlines())
-            requests.post(f'{ENDPOINT}document/' + file_name, data={
-                'content': content,
-            })
+            client.add_document(file_name, content)
         existed_documents.discard(file_name)
     # Delete non-existing documents.
-    for document_id in tqdm(existed_documents, desc='Delete documents'):
+    for document_id in tqdm(existed_documents, desc='Delete documents', disable=verbose):
+        if verbose:
+            print(f'Delete {document_id}')
         client.delete_document(document_id)
 
 
 @cli.command()
 @click.argument('dir')
-def add(dir: str):
+@click.option('-v', '--verbose', is_flag=True)
+def add(dir: str, verbose: bool = False):
     """Add markdown files (Non-existing files will be keeped)."""
-    markdown_files = glob.glob(f'{dir}/*.md')
-    for file in tqdm(markdown_files):
+    client = Client(ENDPOINT, API_KEY)
+    markdown_files = glob.glob(f'{dir}/**/*.md', recursive=True)
+    for file in tqdm(markdown_files, desc='Add documents', disable=verbose):
         file_name = file[len(dir):]
         if file_name.startswith('/'):
             file_name = file_name[1:]
+        if verbose:
+            print(f'Add {file_name}')
         with open(file) as f:
             content = ''.join(f.readlines())
-            requests.post(f'{ENDPOINT}document/' + file_name, data={
-                'content': content,
-            })
+            client.add_document(file_name, content)
 
 
 if __name__ == '__main__':
