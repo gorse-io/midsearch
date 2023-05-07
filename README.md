@@ -10,7 +10,30 @@ MidSearch is a middleware to connect chat bots to search engines. It gerenetes h
 - **Evaluation**: Users or administrators can rate the quality of answers to questions to track the quality of documents.
 - **Multi-platform**: MidSearch can be used by chat bots on different platforms, such as Telegram, Discord, etc.
 
-## Installation
+## Deployment
+
+1. Clone the repository:
+
+```bash
+git clone git@github.com:gorse-io/midsearch.git
+cd midsearch
+```
+
+2. Create a `.env` file in the root directory of the project:
+
+```bash
+# OpenAI API Key
+OPENAI_API_KEY=sk-xxxxxxxx
+
+# MidSearch API Key
+MIDSEARCH_API_KEY=xxxxxxxx
+```
+
+3. Start the MidSearch stack:
+
+```bash
+docker-compose up -d
+```
 
 ## Usage
 
@@ -18,7 +41,33 @@ MidSearch is a middleware to connect chat bots to search engines. It gerenetes h
 
 ### Setup Telegram Bot
 
+1. [Create a Telegram bot](https://sendpulse.com/knowledge-base/chatbot/telegram/create-telegram-chatbot) and paste the bot token in the `.env` file:
+
+```bash
+# Telegram Bot Token
+TELEGRAM_BOT_TOKEN=xxxxxxxx
+```
+
+2. Start the Telegram bot:
+
+```bash
+docker-compose up -d
+```
+
 ### Setup Discord Bot
+
+1. [Create a Discord bot](https://discordpy.readthedocs.io/en/stable/discord.html) and paste the bot token in the `.env` file:
+
+```bash
+# Discord Bot Token
+DISCORD_BOT_TOKEN=xxxxxxxx
+```
+
+2. Start the Discord bot:
+
+```bash
+docker-compose up -d
+```
 
 ## Acknowledgments
 
