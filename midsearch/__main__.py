@@ -15,6 +15,7 @@
 import glob
 import os
 
+from dotenv import load_dotenv
 from tqdm import tqdm
 from telegram.constants import MessageEntityType
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
@@ -24,9 +25,42 @@ import discord
 import click
 import requests
 
+load_dotenv()  # take environment variables from .env.
 
 ENDPOINT = os.getenv('MIDSEARCH_ENDPOINT', 'http://localhost:8080/api/')
 API_KEY = os.getenv('MIDSEARCH_API_KEY')
+
+
+class Client:
+
+    def __init__(self, endpoint: str, api_key: str):
+        if endpoint is None or len(endpoint) == 0:
+            raise ValueError("endpoint must not be empty")
+        self.endpoint = endpoint
+        self.api_key = api_key
+
+    def delete_document(self, document_id: str):
+        r = requests.delete(
+            f"{self.endpoint}documents/{document_id}",
+            headers={'Accept': 'application/json', 'X-Api-Key': self.api_key})
+        r.raise_for_status()
+
+    def list_documents(self, n: int = 10, offset: int = 0):
+        r = requests.get(
+            f"{self.endpoint}documents",
+            params={'n': n, 'offset': offset},
+            headers={'Accept': 'application/json', 'X-Api-Key': self.api_key})
+        r.raise_for_status()
+        return r.json()
+
+    def list_all_documents(self):
+        offset = 0
+        while True:
+            documents = self.list_documents(n=100, offset=offset)
+            yield from documents
+            if len(documents) < 100:
+                break
+            offset += 100
 
 
 @click.group()
@@ -65,6 +99,7 @@ async def telegram_button(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 @cli.command()
 def telegram():
+    """Start Telegram bot."""
     app = ApplicationBuilder().token(os.environ['TELEGRAM_BOT_TOKEN']).build()
     app.add_handler(MessageHandler(filters.TEXT, telegram_handler))
     app.add_handler(CallbackQueryHandler(telegram_button))
@@ -100,12 +135,39 @@ async def on_message(message: discord.Message):
 
 @cli.command()
 def discord():
+    """Start Discord bot."""
     client.run(os.getenv('DISCORD_BOT_TOKEN'))
 
 
 @cli.command()
 @click.argument('dir')
-def ingest(dir: str):
+def sync(dir: str):
+    """Sync markdown files (Non-existing files will be deleted)."""
+    client = Client(ENDPOINT, API_KEY)
+    # List all documents in the server.
+    existed_documents = {document['id']
+                         for document in client.list_all_documents()}
+    # List all documents in the local.
+    markdown_files = glob.glob(f'{dir}/*.md')
+    for file in tqdm(markdown_files, desc='Update documents'):
+        file_name = file[len(dir):]
+        if file_name.startswith('/'):
+            file_name = file_name[1:]
+        with open(file) as f:
+            content = ''.join(f.readlines())
+            requests.post(f'{ENDPOINT}document/' + file_name, data={
+                'content': content,
+            })
+        existed_documents.discard(file_name)
+    # Delete non-existing documents.
+    for document_id in tqdm(existed_documents, desc='Delete documents'):
+        client.delete_document(document_id)
+
+
+@cli.command()
+@click.argument('dir')
+def add(dir: str):
+    """Add markdown files (Non-existing files will be keeped)."""
     markdown_files = glob.glob(f'{dir}/*.md')
     for file in tqdm(markdown_files):
         file_name = file[len(dir):]

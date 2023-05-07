@@ -4,6 +4,10 @@
 <img width=400 src="./assets/midsearch.png">
 </p>
 
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/zhenghaoz/midsearch)](https://hub.docker.com/r/zhenghaoz/midsearch)
+[![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/zhenghaoz/midsearch)](https://hub.docker.com/r/zhenghaoz/midsearch)
+[![Docker Pulls](https://img.shields.io/docker/pulls/zhenghaoz/midsearch)](https://hub.docker.com/r/zhenghaoz/midsearch)
+
 MidSearch is a middleware to connect chat bots to search engines. It gerenetes human friendly answers to user questions based on ingested documents. Besides its basic question answering ability, MidSearch also supports more advanced features:
 
 - **Observality**: Conversactions between users and chat bots are recorded and can be used to improve documents.
