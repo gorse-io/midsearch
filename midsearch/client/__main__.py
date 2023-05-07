@@ -94,7 +94,7 @@ async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             InlineKeyboardButton("\U0001F44E", callback_data="2"),
         ]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_markdown(r.text, reply_markup=reply_markup)
+        await update.message.reply_markdown_v2(r.text, reply_markup=reply_markup)
     else:
         await update.message.reply_text(r.text)
 

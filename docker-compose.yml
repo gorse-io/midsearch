@@ -24,15 +24,17 @@ services:
     build: .
     environment:
       MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
+      MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-    command: python3 midsearch telegram
+    command: python3 midsearch/client telegram
 
   discord-bot:
     build: .
     environment:
       MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
+      MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
       DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
-    command: python3 midsearch discord
+    command: python3 midsearch/client discord
 
 volumes:
   postgres_data:
