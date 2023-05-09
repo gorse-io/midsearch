@@ -98,11 +98,16 @@ async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         if mention_username != f'@{bot.username}':
             return
     logging.info(
-        f'Telegram bot received message, chat_type={update.message.chat.type}')
+        f'Telegram bot received message, user_id={update.message.from_user.username}, chat_type={update.message.chat.type}')
     r = requests.get(
         f"{ENDPOINT}chat",
         params={'message': update.message.text},
-        headers={'Accept': 'text/markdown', 'X-Api-Key': API_KEY})
+        headers={
+            'Accept': 'text/markdown',
+            'User-Agent': 'Telegram',
+            'X-Api-Key': API_KEY,
+            'X-User-Id': str(update.message.from_user.id),
+        })
     if r.status_code == 200:
         keyboard = [[
             InlineKeyboardButton("\U0001F44D", callback_data="1"),
@@ -138,6 +143,22 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
 
+class RatingView(View):
+
+    def __init__(self):
+        super().__init__()
+
+    @discord.ui.button(emoji='👍')
+    async def upvote(self, interaction: discord.Interaction, button: discord.ui.Button):
+        logging.info('Discord bot received button')
+        await interaction.response.defer()
+
+    @discord.ui.button(emoji='👎')
+    async def downvote(self, interaction: discord.Interaction, button: discord.ui.Button):
+        logging.info('Discord bot received button')
+        await interaction.response.defer()
+
+
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
@@ -147,14 +168,17 @@ async def on_ready():
 async def on_message(message: discord.Message):
     if message.author == client.user or message.content == '':
         return
+    logging.info(f'Discord bot received message, user_id={message.author}')
     r = requests.get(
         f"{ENDPOINT}chat",
         params={'message': message.content},
-        headers={'Accept': 'text/markdown', 'X-Api-Key': API_KEY})
-    view = View()
-    view.add_item(Button(label='\U0001F44D'))
-    view.add_item(Button(label='\U0001F44E'))
-    await message.channel.send(r.text, view=view)
+        headers={
+            'Accept': 'text/markdown',
+            'User-Agent': 'Discord',
+            'X-Api-Key': API_KEY,
+            'X-User-Id': str(message.author),
+        })
+    await message.channel.send(r.text, view=RatingView())
 
 
 @cli.command()
