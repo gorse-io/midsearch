@@ -18,10 +18,10 @@ MidSearch is a middleware to connect chat bots to documents search (powered by P
 
 There are two demos of MidSearch:
 
-| Telegram Bot | Documents Source | Language |
-|-|-|-|
-| [How to Cook Bot](https://t.me/how_to_cook_bot) | [Anduin2017/HowToCook](https://github.com/Anduin2017/HowToCook) | Chinese (Simplified) |
-| [Gorse Support Bot](https://t.me/gorse_support_bot) | [https://github.com/gorse-io/docs](gorse-io/docs) | English |
+| Telegram Bot | Documents Source | Language | Tutorial |
+|-|-|-|-|
+| [How to Cook Bot](https://t.me/how_to_cook_bot) | [Anduin2017/HowToCook](https://github.com/Anduin2017/HowToCook) | Chinese (Simplified) | [如何搭建一个菜谱机器人](./examples/how-to-cook-bot/) |
+| [Gorse Support Bot](https://t.me/gorse_support_bot) | [gorse-io/docs](https://github.com/gorse-io/docs) | English | [How to Setup a Gorse Support Bot](./examples/gorse-support-bot/) |
 
 ## Deploy
 
