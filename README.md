@@ -18,10 +18,10 @@ MidSearch is a middleware to connect chat bots to documents search (powered by P
 
 There are two demos of MidSearch:
 
-| Telegram Bot | Documents Source |
-|-|-|
-| [How to Cook Bot](https://t.me/how_to_cook_bot) | [Anduin2017/HowToCook](https://github.com/Anduin2017/HowToCook) |
-| [Gorse Support Bot](https://t.me/gorse_support_bot) | [https://github.com/gorse-io/docs](gorse-io/docs) |
+| Telegram Bot | Documents Source | Language |
+|-|-|-|
+| [How to Cook Bot](https://t.me/how_to_cook_bot) | [Anduin2017/HowToCook](https://github.com/Anduin2017/HowToCook) | Chinese (Simplified) |
+| [Gorse Support Bot](https://t.me/gorse_support_bot) | [https://github.com/gorse-io/docs](gorse-io/docs) | English |
 
 ## Deploy
 
@@ -61,10 +61,12 @@ pip install git+https://github.com/gorse-io/midsearch.git
 2. Add documents:
 
 ```bash
+export MIDSEARCH_ENDPOINT=http://localhost:8080/api/
+export MIDSEARCH_API_KEY=xxxxxxxx
 midsearch add /path/to/documents
 ```
 
-Markdown files in the directory will be ingested as documents. The file name will be used as the document id. The sync command is similar to the add command, except that it will delete documents that are not in the directory.
+Markdown files (*.md) in the directory will be ingested as documents. The file name will be used as the document id. The sync command is similar to the add command, except that it will delete documents that are not in the directory.
 
 ### Setup Telegram Bot
 
