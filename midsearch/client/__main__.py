@@ -14,6 +14,7 @@
 
 import glob
 import os
+import logging
 
 from dotenv import load_dotenv
 from tqdm import tqdm
@@ -30,6 +31,10 @@ load_dotenv()  # take environment variables from .env.
 
 ENDPOINT = os.getenv('MIDSEARCH_ENDPOINT', 'http://localhost:8080/api/')
 API_KEY = os.getenv('MIDSEARCH_API_KEY')
+
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
 
 
 class Client:
@@ -82,9 +87,18 @@ def cli():
 
 
 async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.chat.type != 'private' and (
-            update.message.entities is None or len(update.message.entities) == 0 or update.message.entities[0].type != MessageEntityType.MENTION):
-        return
+    bot = await context.bot.get_me()
+    if update.message.chat.type != 'private':
+        if update.message.entities is None or len(update.message.entities) == 0:
+            return
+        entity = update.message.entities[0]
+        if entity.type != MessageEntityType.MENTION:
+            return
+        mention_username = update.message.text[entity.offset:entity.offset + entity.length]
+        if mention_username != f'@{bot.username}':
+            return
+    logging.info(
+        f'Telegram bot received message, chat_type={update.message.chat.type}')
     r = requests.get(
         f"{ENDPOINT}chat",
         params={'message': update.message.text},
@@ -92,7 +106,7 @@ async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     if r.status_code == 200:
         keyboard = [[
             InlineKeyboardButton("\U0001F44D", callback_data="1"),
-            InlineKeyboardButton("\U0001F44E", callback_data="2"),
+            InlineKeyboardButton("\U0001F44E", callback_data="0"),
         ]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_markdown_v2(escape_markdown(r.text, version=2), reply_markup=reply_markup)
@@ -103,6 +117,7 @@ async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 async def telegram_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
+    logging.info(f'Telegram bot received button, data={query.data}')
     await query.answer()
 
 
