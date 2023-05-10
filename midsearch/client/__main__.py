@@ -45,6 +45,14 @@ class Client:
         self.endpoint = endpoint
         self.api_key = api_key
 
+    def chat(self, message: str):
+        r = requests.post(
+            f"{self.endpoint}chat",
+            headers={'Accept': 'application/json', 'X-Api-Key': self.api_key},
+            data={'message': message})
+        r.raise_for_status()
+        return r.json()
+
     def add_document(self, id: str, content: str):
         r = requests.post(
             f"{self.endpoint}document/",
@@ -123,7 +131,17 @@ async def telegram_button(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     logging.info(f'Telegram bot received button, data={query.data}')
-    await query.answer()
+    keyboard = [[
+        InlineKeyboardButton(
+            "\U0001F60A" if query.data == "1" else "\U0001F44D", callback_data="1"),
+        InlineKeyboardButton(
+            "\U0001F62D" if query.data == "0" else "\U0001F44E", callback_data="0"),
+    ]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    if query.message.reply_markup != reply_markup:
+        await query.message.edit_reply_markup(reply_markup)
+    else:
+        await query.answer()
 
 
 @cli.command()
@@ -145,18 +163,25 @@ client = discord.Client(intents=intents)
 
 class RatingView(View):
 
-    def __init__(self):
+    def __init__(self, conversation_id: str):
         super().__init__()
+        self.conversation_id = conversation_id
 
     @discord.ui.button(emoji='👍')
     async def upvote(self, interaction: discord.Interaction, button: discord.ui.Button):
-        logging.info('Discord bot received button')
+        logging.info(
+            f'Discord bot received button, conversation_id={self.conversation_id}')
         await interaction.response.defer()
+        await interaction.message.remove_reaction('👎', client.user)
+        await interaction.message.add_reaction('👍')
 
     @discord.ui.button(emoji='👎')
     async def downvote(self, interaction: discord.Interaction, button: discord.ui.Button):
-        logging.info('Discord bot received button')
+        logging.info(
+            f'Discord bot received button, conversation_id={self.conversation_id}')
         await interaction.response.defer()
+        await interaction.message.remove_reaction('👍', client.user)
+        await interaction.message.add_reaction('👎')
 
 
 @client.event
@@ -178,7 +203,11 @@ async def on_message(message: discord.Message):
             'X-Api-Key': API_KEY,
             'X-User-Id': str(message.author),
         })
-    await message.channel.send(r.text, view=RatingView())
+    if r.status_code == 200:
+        conversation_id = r.headers.get('X-Conversation-Id')
+        await message.channel.send(r.text, view=RatingView(conversation_id))
+    else:
+        await message.channel.send(r.text)
 
 
 @cli.command()

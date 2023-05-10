@@ -53,7 +53,8 @@ pg = PGVector(os.environ['POSTGRES_URL'])
 app = Flask(__name__, static_folder="./static", static_url_path="/")
 
 limiter = Limiter(
-    lambda: request.headers.get("X-User-Id") or request.remote_addr or "127.0.0.1",
+    lambda: request.headers.get(
+        "X-User-Id") or request.remote_addr or "127.0.0.1",
     app=app,
     storage_uri="memory://",
 )
@@ -137,15 +138,11 @@ def chat():
     chat = ChatOpenAI()
     chain = load_qa_chain(chat, chain_type="stuff")
     answer = chain.run(input_documents=docs, question=question)
-    pg.add_conversation(Conversation(
+    conversation_id = pg.add_conversation(Conversation(
         question=question, answer=answer, prompt=prompt, user_agent=user_agent, user_id=user_id))
-    # Render answer
-    if mime_type == 'text/markdown':
-        return answer
-    elif mime_type == 'text/html':
-        return mistune.html(answer)
-    else:
-        return f"unsupported accept MIME type: {mime_type}", 400
+    resp = make_response(answer)
+    resp.headers['X-Conversation-Id'] = conversation_id
+    return resp
 
 
 @app.route("/api/conversations/", methods=['GET'])
