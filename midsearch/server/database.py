@@ -54,6 +54,8 @@ class Conversation(Base):
     answer = sqlalchemy.Column(sqlalchemy.String)
     prompt = sqlalchemy.Column(sqlalchemy.String)
     helpful = sqlalchemy.Column(sqlalchemy.Boolean)
+    user_agent = sqlalchemy.Column(sqlalchemy.String)
+    user_id = sqlalchemy.Column(sqlalchemy.String)
     timestamp = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.utcnow)
 

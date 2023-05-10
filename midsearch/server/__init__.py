@@ -19,6 +19,7 @@ from functools import wraps
 import mistune
 import openai.error
 from flask import Flask, jsonify, request, make_response
+from flask_limiter import Limiter
 from flask_login import LoginManager, UserMixin, login_user
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import Document
@@ -28,7 +29,8 @@ from midsearch.server.database import PGVector, Conversation
 from midsearch.server.docutils import create_markdown_document, count_tokens
 
 # Load gloabl config
-MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 4096))
+MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 3000))
+RATE_LIMIT = os.getenv('MIDSEARCH_RATE_LIMIT', '10/hour')
 USERNAME = os.getenv('MIDSEARCH_USERNAME')
 PASSWORD = os.getenv('MIDSEARCH_PASSWORD')
 API_KEY = os.getenv('MIDSEARCH_API_KEY')
@@ -49,6 +51,12 @@ def key_required(f):
 pg = PGVector(os.environ['POSTGRES_URL'])
 
 app = Flask(__name__, static_folder="./static", static_url_path="/")
+
+limiter = Limiter(
+    lambda: request.headers.get("X-User-Id") or request.remote_addr or "127.0.0.1",
+    app=app,
+    storage_uri="memory://",
+)
 
 
 # Add error handlers
@@ -105,15 +113,18 @@ def search():
 
 @app.route("/api/chat/")
 @key_required
+@limiter.limit(RATE_LIMIT)
 def chat():
     # Get question
     question = request.args.get('message')
+    user_agent = request.headers.get('User-Agent')
+    user_id = request.headers.get('X-User-Id')
     # Get accept MIME type
     mime_type = request.accept_mimetypes.best_match(
         ['text/html', 'text/markdown'])
     # Search revelevant documents
     chunks = pg.search_documents(question)
-    prompt = ''.join([chunk.content for chunk, _ in chunks])
+    prompt = '\n'.join([chunk.content for chunk, _ in chunks])
     docs = []
     length = 0
     for chunk, _ in chunks:
@@ -127,7 +138,7 @@ def chat():
     chain = load_qa_chain(chat, chain_type="stuff")
     answer = chain.run(input_documents=docs, question=question)
     pg.add_conversation(Conversation(
-        question=question, answer=answer, prompt=prompt))
+        question=question, answer=answer, prompt=prompt, user_agent=user_agent, user_id=user_id))
     # Render answer
     if mime_type == 'text/markdown':
         return answer
@@ -148,6 +159,8 @@ def get_conversations():
         'answer': mistune.html(conversation.answer),
         'prompt': mistune.html(conversation.prompt),
         'helpful': conversation.helpful,
+        'user_agent': conversation.user_agent,
+        'user_id': conversation.user_id,
         'timestamp': conversation.timestamp,
     } for conversation in conversations])
 

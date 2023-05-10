@@ -106,7 +106,7 @@ async def telegram_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             'Accept': 'text/markdown',
             'User-Agent': 'Telegram',
             'X-Api-Key': API_KEY,
-            'X-User-Id': str(update.message.from_user.id),
+            'X-User-Id': update.message.from_user.username,
         })
     if r.status_code == 200:
         keyboard = [[
