@@ -27,8 +27,9 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: zhenghaoz/midsearch:nightly
-          
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Resolve Images on Description
         run: |
           sed -i -E "s/src=\"assets\//src=\"https:\/\/github.com\/gorse-io\/midsearch\/raw\/main\/assets\//" README.md
