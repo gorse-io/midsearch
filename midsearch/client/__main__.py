@@ -16,13 +16,18 @@ import glob
 import os
 import logging
 
+from discord.ui import View
 from dotenv import load_dotenv
+from graia.ariadne.message import Source
+from graia.ariadne.message.chain import MessageChain
+from graia.ariadne.app import Ariadne
+from graia.ariadne.connection.config import config, HttpClientConfig, WebsocketClientConfig
+from graia.ariadne.model import Friend
 from tqdm import tqdm
 from telegram.constants import MessageEntityType
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from telegram.helpers import escape_markdown
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from discord.ui import Button, View
 import discord
 import click
 import requests
@@ -214,6 +219,39 @@ async def on_message(message: discord.Message):
 def discord():
     """Start Discord bot."""
     client.run(os.getenv('DISCORD_BOT_TOKEN'))
+
+
+#############
+# Mirai Bot #
+#############
+
+
+app = Ariadne(config(
+    int(os.getenv('MIRAI_BOT_QQ')),
+    os.getenv('MIRAI_VERIFY_KEY'),
+    HttpClientConfig(os.getenv('MIRAI_HTTP_URL')),
+    WebsocketClientConfig(os.getenv('MIRAI_WS_URL')),
+))
+
+
+@app.broadcast.receiver("FriendMessage")
+async def friend_message_listener(app: Ariadne, friend: Friend, chain: MessageChain):
+    logging.info(f'Mirai bot received message, user_id={friend.id}')
+    r = requests.get(
+        f"{ENDPOINT}chat",
+        params={'message': str(chain)},
+        headers={
+            'Accept': 'text/markdown',
+            'User-Agent': 'Mirai',
+            'X-Api-Key': API_KEY,
+            'X-User-Id': str(friend.id),
+        })
+    await app.send_message(friend, r.text)
+
+
+@cli.command()
+def mirai():
+    Ariadne.launch_blocking()
 
 
 @cli.command()

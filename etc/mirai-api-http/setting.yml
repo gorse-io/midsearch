@@ -1,0 +1,23 @@
+adapters:
+  - http
+  - ws
+
+enableVerify: true
+verifyKey: VtAcXrCgyT9EtM4v
+
+debug: false
+
+singleMode: false
+
+cacheSize: 4096
+
+adapterSettings:
+  http:
+    host: 0.0.0.0
+    port: 5700
+    cors: ["*"]
+    unreadQueueMaxSize: 100
+  ws:
+    host: 0.0.0.0
+    port: 5701
+    reservedSyncId: -1

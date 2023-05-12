@@ -4,6 +4,7 @@ flask==2.2.3
 Flask-Limiter==3.3.1
 Flask-Login==0.6.0
 Flask-Login==0.6.0
+graia-ariadne==0.11.5
 langchain==0.0.153
 mistune==2.0.4
 openai==0.27.4
