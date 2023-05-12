@@ -9,7 +9,7 @@
 
         <v-app-bar app color="primary" dark>
             <v-spacer></v-spacer>
-            <v-btn icon>
+            <v-btn icon @click="logout">
                 <v-icon>mdi-exit-to-app</v-icon>
             </v-btn>
         </v-app-bar>
@@ -41,19 +41,9 @@ export default {
         };
     },
     methods: {
-        search() {
-            if (this.query === "") {
-                this.documents = [];
-                return;
-            }
-            axios.get("/api/search/", {
-                params: {
-                    query: this.query
-                }
-            }).then((response) => {
-                this.documents = response.data;
-            }).catch((error) => {
-                console.log(error);
+        logout() {
+            axios.post("/api/logout").then(() => {
+                this.$router.push("/login");
             });
         }
     },

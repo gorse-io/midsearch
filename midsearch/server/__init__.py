@@ -106,11 +106,11 @@ def login():
         return 'Invalid username/password', 401
 
 
-@app.route("/logout")
+@app.route("/api/logout/", methods=['POST'])
 @login_required
 def logout():
     logout_user()
-    return redirect('/')
+    return jsonify({'success': True})
 
 
 @app.route("/api/search/")
