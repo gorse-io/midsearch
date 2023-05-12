@@ -77,7 +77,19 @@ Markdown files (*.md) in the directory will be ingested as documents. The file n
 TELEGRAM_BOT_TOKEN=xxxxxxxx
 ```
 
-2. Start the Telegram bot:
+2. Uncomment the following lines in the `docker-compose.yml` file:
+
+```yaml
+  telegram-bot:
+    build: .
+    environment:
+      MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
+      MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    command: python3 midsearch/client telegram
+```
+
+3. Start the Telegram bot:
 
 ```bash
 docker-compose up -d
@@ -92,7 +104,19 @@ docker-compose up -d
 DISCORD_BOT_TOKEN=xxxxxxxx
 ```
 
-2. Start the Discord bot:
+2. Uncomment the following lines in the `docker-compose.yml` file:
+
+```yaml
+  discord-bot:
+    build: .
+    environment:
+      MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
+      MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+    command: python3 midsearch/client discord
+```
+
+3. Start the Discord bot:
 
 ```bash
 docker-compose up -d

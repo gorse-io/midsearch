@@ -20,45 +20,48 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
 
-  telegram-bot:
-    build: .
-    environment:
-      MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
-      MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-    command: python3 midsearch/client telegram
+  # Uncomment to enable telegram bot
+  # telegram-bot:
+  #   build: .
+  #   environment:
+  #     MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
+  #     MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
+  #     TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+  #   command: python3 midsearch/client telegram
 
-  discord-bot:
-    build: .
-    environment:
-      MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
-      MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
-      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
-    command: python3 midsearch/client discord
+  # Uncomment to enable discord bot
+  # discord-bot:
+  #   build: .
+  #   environment:
+  #     MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
+  #     MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
+  #     DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+  #   command: python3 midsearch/client discord
 
-  mirai-bot:
-    build: .
-    environment:
-      MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
-      MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
-      MIRAI_BOT_QQ: ${MIRAI_BOT_QQ}
-      MIRAI_VERIFY_KEY: ${MIRAI_VERIFY_KEY}
-      MIRAI_HTTP_URL: ${MIRAI_HTTP_URL}
-      MIRAI_WS_URL: ${MIRAI_WS_URL}
-    command: python3 midsearch/client mirai
+  # Uncomment to enable mirai bot
+  # mirai-bot:
+  #   build: .
+  #   environment:
+  #     MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
+  #     MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
+  #     MIRAI_BOT_QQ: ${MIRAI_BOT_QQ}
+  #     MIRAI_VERIFY_KEY: ${MIRAI_VERIFY_KEY}
+  #     MIRAI_HTTP_URL: ${MIRAI_HTTP_URL}
+  #     MIRAI_WS_URL: ${MIRAI_WS_URL}
+  #   command: python3 midsearch/client mirai
 
-  mirai:
-    image: lss233/mirai-http:latest
-    restart: always
-    environment:
-      LANG: 'C.UTF-8'
-    ports:
-      - 5700:5700
-      - 5701:5701
-    volumes:
-      - mirai_data:/app/data
-      - mirai_bots:/app/bots
-      - ./etc/mirai-api-http/setting.yml:/app/config/net.mamoe.mirai-api-http/setting.yml
+  # mirai:
+  #   image: lss233/mirai-http:latest
+  #   restart: always
+  #   environment:
+  #     LANG: 'C.UTF-8'
+  #   ports:
+  #     - 5700:5700
+  #     - 5701:5701
+  #   volumes:
+  #     - mirai_data:/app/data
+  #     - mirai_bots:/app/bots
+  #     - ./etc/mirai-api-http/setting.yml:/app/config/net.mamoe.mirai-api-http/setting.yml
 
 volumes:
   postgres_data:

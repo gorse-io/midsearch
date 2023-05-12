@@ -1,7 +1,7 @@
 set dotenv-load
 
 export FLASK_DEBUG := "1"
-export FLASK_APP := "midsearch"
+export FLASK_APP := "midsearch.server"
 export POSTGRES_URL := "postgresql://midsearch:midsearch_password@localhost:5432/midsearch"
 
 stop-backend:

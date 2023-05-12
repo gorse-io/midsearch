@@ -7,6 +7,7 @@
                         <v-text-field v-model="username" label="Username" required></v-text-field>
                         <v-text-field v-model="password" label="Password" required type="password"></v-text-field>
                     </v-form>
+                    <v-alert v-if="message" color="error" :text="message"></v-alert>
                 </v-card-text>
                 <v-card-actions>
                     <v-btn @click="login" variant="text" color="primary" block>Login</v-btn>
@@ -23,20 +24,27 @@ export default {
     data() {
         return {
             username: '',
-            password: ''
+            password: '',
+            message: ''
         }
     },
     methods: {
         login() {
-            axios.post('/api/login/', {
-                username: this.username,
-                password: this.password
-            }).then((response) => {
-                this.$store.commit('setToken', response.data.token);
-                this.$store.commit('setUsername', this.username);
+            if (this.username === '') {
+                this.message = 'Username is required';
+                return;
+            }
+            if (this.password === '') {
+                this.message = 'Password is required';
+                return;
+            }
+            var formData = new FormData();
+            formData.append('username', this.username);
+            formData.append('password', this.password);
+            axios.post('/api/login/', formData).then(() => {
                 this.$router.push('/');
             }).catch((error) => {
-                console.log(error);
+                this.message = error.response.data;
             })
         }
     }

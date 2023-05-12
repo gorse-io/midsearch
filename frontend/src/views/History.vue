@@ -43,7 +43,7 @@
                                         <template v-slot:activator="{ props }">
                                             <v-btn prepend-icon="mdi-message-arrow-right-outline" color="primary"
                                                 size="small" variant="text" v-bind="props">
-                                                View Prompt
+                                                View Context
                                             </v-btn>
                                         </template>
                                         <v-card>

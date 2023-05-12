@@ -18,9 +18,9 @@ from functools import wraps
 
 import mistune
 import openai.error
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request, make_response, redirect
 from flask_limiter import Limiter
-from flask_login import LoginManager, UserMixin, login_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import Document
 from langchain.chains.question_answering import load_qa_chain
@@ -31,14 +31,18 @@ from midsearch.server.docutils import create_markdown_document, count_tokens
 # Load gloabl config
 MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 3000))
 RATE_LIMIT = os.getenv('MIDSEARCH_RATE_LIMIT', '10/hour')
-USERNAME = os.getenv('MIDSEARCH_USERNAME')
-PASSWORD = os.getenv('MIDSEARCH_PASSWORD')
+USERNAME = os.getenv('MIDSEARCH_USERNAME', 'admin')
+PASSWORD = os.getenv('MIDSEARCH_PASSWORD', 'admin')
 API_KEY = os.getenv('MIDSEARCH_API_KEY')
+SECRET_KEY = os.getenv('MIDSEARCH_SECRET_KEY')
 
 
 def key_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
+        # Check if user is logged in
+        if current_user.is_authenticated:
+            return f(*args, **kwargs)
         token = ''
         if 'X-Api-Key' in request.headers:
             token = request.headers['X-Api-Key']
@@ -51,6 +55,7 @@ def key_required(f):
 pg = PGVector(os.environ['POSTGRES_URL'])
 
 app = Flask(__name__, static_folder="./static", static_url_path="/")
+app.config['SECRET_KEY'] = SECRET_KEY
 
 limiter = Limiter(
     lambda: request.headers.get(
@@ -76,8 +81,10 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    if user_id == os.getenv('MIDSEARCH_USERNAME'):
-        return UserMixin()
+    if user_id == USERNAME:
+        user = UserMixin()
+        user.id = USERNAME
+        return user
     return None
 
 
@@ -86,16 +93,24 @@ def index():
     return app.send_static_file("index.html")
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/api/login/', methods=['POST'])
 def login():
     username = request.form.get('username')
     password = request.form.get('password')
-    if username == os.getenv('MIDSEARCH_USERNAME') and password == os.getenv('MIDSEARCH_PASSWORD'):
+    if username == USERNAME and password == PASSWORD:
         user = UserMixin()
+        user.id = USERNAME
         login_user(user)
         return jsonify({'success': True})
     else:
-        return jsonify({'success': False})
+        return 'Invalid username/password', 401
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect('/')
 
 
 @app.route("/api/search/")
@@ -146,6 +161,7 @@ def chat():
 
 
 @app.route("/api/conversations/", methods=['GET'])
+@login_required
 def get_conversations():
     offset = request.args.get('offset', 0)
     n = request.args.get('n', 10)
@@ -163,11 +179,13 @@ def get_conversations():
 
 
 @app.route("/api/conversations/count/", methods=['GET'])
+@login_required
 def count_conversations():
     return jsonify(pg.count_conversations())
 
 
 @app.route("/api/conversation/<id>", methods=['POST'])
+@login_required
 def update_conversation(id: int):
     helpful = request.form.get('helpful')
     pg.update_conversation(id=id, helpful=(helpful == 'true'))
@@ -175,12 +193,14 @@ def update_conversation(id: int):
 
 
 @app.route("/api/conversation/<id>", methods=['DELETE'])
+@login_required
 def delete_conversation(id: int):
     pg.delete_conversation(id=id)
     return jsonify({'success': True})
 
 
 @app.route("/api/documents/count/", methods=['GET'])
+@login_required
 def count_documents():
     return jsonify(pg.count_documents())
 
@@ -194,6 +214,7 @@ def delete_document():
 
 
 @app.route("/api/documents/", methods=['GET'])
+@login_required
 def get_documents():
     offset = request.args.get('offset', 0)
     n = request.args.get('n', 10)
