@@ -14,6 +14,8 @@ MidSearch is a middleware to connect chat bots to documents search (powered by P
 - **Evaluation**: Users or administrators can rate the quality of answers to questions to track the quality of documents.
 - **Multi-platform**: MidSearch can be used by chat bots on different platforms, such as Telegram, Discord, etc.
 
+![](./assets/preview.png)
+
 ## Demos
 
 There are two demos of MidSearch:

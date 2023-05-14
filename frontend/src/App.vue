@@ -9,7 +9,7 @@
 
         <v-app-bar app color="primary" dark>
             <v-spacer></v-spacer>
-            <v-btn icon @click="logout">
+            <v-btn icon @click="logout" v-if="$route.name != 'Login'">
                 <v-icon>mdi-exit-to-app</v-icon>
             </v-btn>
         </v-app-bar>

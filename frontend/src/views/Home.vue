@@ -45,7 +45,7 @@ export default {
                     }
                 },
                 legend: {
-                    data: ['Accept', 'Reject', 'TBD']
+                    data: ['Upvote', 'Downvote', 'TBD']
                 },
                 toolbox: {
                     feature: {
@@ -72,7 +72,7 @@ export default {
                 ],
                 series: [
                     {
-                        name: 'Accept',
+                        name: 'Upvote',
                         type: 'line',
                         stack: 'Total',
                         areaStyle: {},
@@ -83,7 +83,7 @@ export default {
                         itemStyle: { color: 'green' },
                     },
                     {
-                        name: 'Reject',
+                        name: 'Downvote',
                         type: 'line',
                         stack: 'Total',
                         areaStyle: {},

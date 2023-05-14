@@ -25,11 +25,11 @@
                                 <v-col>
                                     <v-btn prepend-icon="mdi-check" color="teal" size="small" variant="text"
                                         @click="accept(index)">
-                                        Accept
+                                        Upvote
                                     </v-btn>
                                     <v-btn prepend-icon="mdi-close" color="error" size="small" variant="text"
                                         @click="reject(index)">
-                                        Reject
+                                        Downvote
                                     </v-btn>
                                     <v-btn prepend-icon="mdi-delete" color="warning" size="small" variant="text"
                                         @click="remove(conversation.id)">
