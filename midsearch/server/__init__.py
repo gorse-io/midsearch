@@ -14,6 +14,8 @@
 
 import hashlib
 import os
+import random
+import string
 from datetime import date, datetime, timedelta
 from functools import wraps
 
@@ -35,11 +37,12 @@ if os.getenv('OPENAI_PROXY'):
 
 # Load gloabl config
 MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 3000))
-RATE_LIMIT = os.getenv('MIDSEARCH_RATE_LIMIT', '10/hour')
+RATE_LIMIT = os.getenv('MIDSEARCH_RATE_LIMIT', '30/hour')
 USERNAME = os.getenv('MIDSEARCH_USERNAME', 'admin')
 PASSWORD = os.getenv('MIDSEARCH_PASSWORD', 'admin')
 API_KEY = os.getenv('MIDSEARCH_API_KEY')
-SECRET_KEY = os.getenv('MIDSEARCH_SECRET_KEY')
+SECRET_KEY = os.getenv('MIDSEARCH_SECRET_KEY', ''.join(
+    random.choices(string.ascii_uppercase + string.digits, k=8)))
 
 
 def key_required(f):
