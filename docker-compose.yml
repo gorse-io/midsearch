@@ -12,7 +12,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   midsearch:
-    build: .
+    image: zhenghaoz/midsearch:nightly
     ports:
       - 8080:8080
     environment:
@@ -22,7 +22,7 @@ services:
 
   # Uncomment to enable telegram bot
   # telegram-bot:
-  #   build: .
+  #   image: zhenghaoz/midsearch:nightly
   #   environment:
   #     MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
   #     MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
@@ -31,7 +31,7 @@ services:
 
   # Uncomment to enable discord bot
   # discord-bot:
-  #   build: .
+  #   image: zhenghaoz/midsearch:nightly
   #   environment:
   #     MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
   #     MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}
@@ -40,7 +40,7 @@ services:
 
   # Uncomment to enable mirai bot
   # mirai-bot:
-  #   build: .
+  #   image: zhenghaoz/midsearch:nightly
   #   environment:
   #     MIDSEARCH_ENDPOINT: http://midsearch:8080/api/
   #     MIDSEARCH_API_KEY: ${MIDSEARCH_API_KEY}

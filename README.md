@@ -35,11 +35,17 @@ cd midsearch
 2. Create a `.env` file in the root directory of the project:
 
 ```bash
-# OpenAI API Key
+# OpenAI API key
 OPENAI_API_KEY=sk-xxxxxxxx
 
-# MidSearch API Key
+# MidSearch API key
 MIDSEARCH_API_KEY=xxxxxxxx
+# MidSearch admin username (default: admin)
+MIDSEARCH_USERNAME=admin
+# MidSearch admin password (default: admin)
+MIDSEARCH_PASSWORD=admin
+# MidSearch rate limit (default: 30/hour)
+MIDSEARCH_RATE_LIMIT=30/hour
 ```
 
 3. Start the MidSearch stack:
@@ -47,6 +53,8 @@ MIDSEARCH_API_KEY=xxxxxxxx
 ```bash
 docker-compose up -d
 ```
+
+4. Access the MidSearch admin panel at http://localhost:8080/.
 
 ## Usage
 
