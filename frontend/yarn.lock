@@ -1255,6 +1255,7 @@ __metadata:
     eslint: ^8.22.0
     eslint-plugin-vue: ^9.3.0
     github-markdown-css: ^4.0.0
+    marked: ^5.0.2
     roboto-fontface: "*"
     sass: ^1.55.0
     vite: ^3.1.9
@@ -1736,6 +1737,15 @@ __metadata:
     socks-proxy-agent: ^7.0.0
     ssri: ^9.0.0
   checksum: 2332eb9a8ec96f1ffeeea56ccefabcb4193693597b132cd110734d50f2928842e22b84cfa1508e921b8385cdfd06dda9ad68645fed62b50fff629a580f5fb72c
+  languageName: node
+  linkType: hard
+
+"marked@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "marked@npm:5.0.2"
+  bin:
+    marked: bin/marked.js
+  checksum: 9d66c998a91d33c422f6242fe08c3b451e4e7863a37e990617179f96786f613e49176859dacc9557d3f6944b2afe44feaaa6a1187550a68746f070c250462213
   languageName: node
   linkType: hard
 

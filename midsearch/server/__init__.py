@@ -14,6 +14,7 @@
 
 import hashlib
 import os
+from datetime import date, datetime, timedelta
 from functools import wraps
 
 import mistune
@@ -27,6 +28,10 @@ from langchain.chains.question_answering import load_qa_chain
 
 from midsearch.server.database import PGVector, Conversation
 from midsearch.server.docutils import create_markdown_document, count_tokens
+
+# Set proxy for OpenAI API
+if os.getenv('OPENAI_PROXY'):
+    openai.proxy = os.getenv('OPENAI_PROXY')
 
 # Load gloabl config
 MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 3000))
@@ -135,9 +140,6 @@ def chat():
     question = request.args.get('message')
     user_agent = request.headers.get('User-Agent')
     user_id = request.headers.get('X-User-Id')
-    # Get accept MIME type
-    mime_type = request.accept_mimetypes.best_match(
-        ['text/html', 'text/markdown'])
     # Search revelevant documents
     chunks = pg.search_documents(question)
     prompt = '\n'.join([chunk.content for chunk, _ in chunks])
@@ -197,6 +199,16 @@ def update_conversation(id: int):
 def delete_conversation(id: int):
     pg.delete_conversation(id=id)
     return jsonify({'success': True})
+
+
+@app.route("/api/quality/", methods=['GET'])
+def get_conversations_quality():
+    duration = request.args.get('duration', 7, type=int)
+    end_date = date.today()
+    begin_date = end_date - timedelta(days=duration)
+    quality = pg.get_conversations_quality(
+        begin_date=begin_date, end_date=end_date)
+    return jsonify(quality)
 
 
 @app.route("/api/documents/count/", methods=['GET'])

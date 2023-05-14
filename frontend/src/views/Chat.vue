@@ -21,6 +21,7 @@
 
 <script>
 import axios from 'axios';
+import { marked } from 'marked';
 
 export default {
 	name: "Chat",
@@ -44,7 +45,7 @@ export default {
 					message: this.message
 				}
 			}).then((response) => {
-				this.reply = response.data;
+				this.reply = marked(response.data);
 				this.waiting = false;
 			}).catch((error) => {
 				console.log(error);

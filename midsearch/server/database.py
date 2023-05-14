@@ -138,3 +138,18 @@ class PGVector:
     def count_conversations(self) -> int:
         with Session(self.engine) as session:
             return session.query(Conversation).count()
+
+    def get_conversations_quality(self, begin_date: datetime.date, end_date: datetime.date) -> Tuple[List[datetime.date], List[int], List[int], List[int]]:
+        with Session(self.engine) as session:
+            rows = session.execute(sqlalchemy.text('select date(timestamp), helpful, count(*) from conversation where date(timestamp) >= :begin_date and date(timestamp) <= :end_date group by date(timestamp), helpful'),
+                                   {"begin_date": begin_date, "end_date": end_date}).fetchall()
+            count = {}
+            for row in rows:
+                count[(row[0], row[1])] = row[2]
+            quality = [], [], [], []
+            for date in range((end_date - begin_date).days + 1):
+                date = begin_date + datetime.timedelta(days=date)
+                quality[0].append(date.strftime("%Y-%m-%d"))
+                for idx, helpful in enumerate([True, False, None]):
+                    quality[idx + 1].append(count.get((date, helpful), 0))
+            return quality

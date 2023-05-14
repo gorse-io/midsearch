@@ -8,7 +8,9 @@
     </v-container>
 </template>
 
-<script setup>
+<script>
+import axios from 'axios';
+
 import { use } from "echarts/core";
 import {
     TitleComponent,
@@ -23,92 +25,112 @@ import { CanvasRenderer } from 'echarts/renderers';
 import VChart from "vue-echarts";
 import { ref } from "vue";
 
-use([
-    TitleComponent,
-    ToolboxComponent,
-    TooltipComponent,
-    GridComponent,
-    LegendComponent,
-    LineChart,
-    CanvasRenderer,
-    UniversalTransition
-]);
-
-const option = ref({
-    title: {
-        text: 'Answer Quality'
+export default {
+    components: {
+        VChart
     },
-    tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-            type: 'cross',
-            label: {
-                backgroundColor: '#6a7985'
-            }
+    data() {
+        return {
+            option: ref({
+                title: {
+                    text: 'Answer Quality'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        label: {
+                            backgroundColor: '#6a7985'
+                        }
+                    }
+                },
+                legend: {
+                    data: ['Accept', 'Reject', 'TBD']
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: []
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Accept',
+                        type: 'line',
+                        stack: 'Total',
+                        areaStyle: {},
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        data: [],
+                        itemStyle: { color: 'green' },
+                    },
+                    {
+                        name: 'Reject',
+                        type: 'line',
+                        stack: 'Total',
+                        areaStyle: {},
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        data: [],
+                        itemStyle: { color: 'red' },
+                    },
+                    {
+                        name: 'TBD',
+                        type: 'line',
+                        stack: 'Total',
+                        areaStyle: {},
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        data: [],
+                        itemStyle: { color: 'orange' },
+                    }
+                ]
+            })
         }
     },
-    legend: {
-        data: ['Accept', 'Reject', 'TBD']
+    setup() {
+        use([
+            TitleComponent,
+            ToolboxComponent,
+            TooltipComponent,
+            GridComponent,
+            LegendComponent,
+            LineChart,
+            CanvasRenderer,
+            UniversalTransition
+        ]);
     },
-    toolbox: {
-        feature: {
-            saveAsImage: {}
-        }
-    },
-    grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-    },
-    xAxis: [
-        {
-            type: 'category',
-            boundaryGap: false,
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        }
-    ],
-    yAxis: [
-        {
-            type: 'value'
-        }
-    ],
-    series: [
-        {
-            name: 'Accept',
-            type: 'line',
-            stack: 'Total',
-            areaStyle: {},
-            emphasis: {
-                focus: 'series'
-            },
-            data: [120, 132, 101, 134, 90, 230, 210],
-            itemStyle: { color: 'green' },
-        },
-        {
-            name: 'Reject',
-            type: 'line',
-            stack: 'Total',
-            areaStyle: {},
-            emphasis: {
-                focus: 'series'
-            },
-            data: [220, 182, 191, 234, 290, 330, 310],
-            itemStyle: { color: 'red' },
-        },
-        {
-            name: 'TBD',
-            type: 'line',
-            stack: 'Total',
-            areaStyle: {},
-            emphasis: {
-                focus: 'series'
-            },
-            data: [150, 232, 201, 154, 190, 330, 410],
-            itemStyle: { color: 'orange' },
-        }
-    ]
-});
+    mounted() {
+        axios.get('/api/quality/').then((response) => {
+            this.option.xAxis[0].data = response.data[0];
+            this.option.series[0].data = response.data[1];
+            this.option.series[1].data = response.data[2];
+            this.option.series[2].data = response.data[3];
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+}
 </script>
 
 <style scoped>
