@@ -226,31 +226,29 @@ def discord():
 #############
 
 
-app = Ariadne(config(
-    int(os.getenv('MIRAI_BOT_QQ')),
-    os.getenv('MIRAI_VERIFY_KEY'),
-    HttpClientConfig(os.getenv('MIRAI_HTTP_URL')),
-    WebsocketClientConfig(os.getenv('MIRAI_WS_URL')),
-))
-
-
-@app.broadcast.receiver("FriendMessage")
-async def friend_message_listener(app: Ariadne, friend: Friend, chain: MessageChain):
-    logging.info(f'Mirai bot received message, user_id={friend.id}')
-    r = requests.get(
-        f"{ENDPOINT}chat",
-        params={'message': str(chain)},
-        headers={
-            'Accept': 'text/markdown',
-            'User-Agent': 'Mirai',
-            'X-Api-Key': API_KEY,
-            'X-User-Id': str(friend.id),
-        })
-    await app.send_message(friend, r.text)
-
-
 @cli.command()
 def mirai():
+    app = Ariadne(config(
+        int(os.getenv('MIRAI_BOT_QQ')),
+        os.getenv('MIRAI_VERIFY_KEY'),
+        HttpClientConfig(os.getenv('MIRAI_HTTP_URL')),
+        WebsocketClientConfig(os.getenv('MIRAI_WS_URL')),
+    ))
+
+    @app.broadcast.receiver("FriendMessage")
+    async def friend_message_listener(app: Ariadne, friend: Friend, chain: MessageChain):
+        logging.info(f'Mirai bot received message, user_id={friend.id}')
+        r = requests.get(
+            f"{ENDPOINT}chat",
+            params={'message': str(chain)},
+            headers={
+                'Accept': 'text/markdown',
+                'User-Agent': 'Mirai',
+                'X-Api-Key': API_KEY,
+                'X-User-Id': str(friend.id),
+            })
+        await app.send_message(friend, r.text)
+
     Ariadne.launch_blocking()
 
 
