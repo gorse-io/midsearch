@@ -40,6 +40,14 @@ cd midsearch
 # OpenAI API key
 OPENAI_API_KEY=sk-xxxxxxxx
 
+# Uncomment the following line if you want to use mirror of OpenAI API
+# OpenAI API base URL (default: https://api.openai.com/v1)
+# OPENAI_API_BASE=https://api.openai.com/v1
+
+# Uncomment the following line if you want to use proxy for OpenAI API
+# OpenAI proxy (default: none)
+# OPENAI_PROXY=http://localhost:7890
+
 # MidSearch API key
 MIDSEARCH_API_KEY=xxxxxxxx
 # MidSearch admin username (default: admin)

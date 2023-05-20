@@ -35,6 +35,10 @@ from midsearch.server.docutils import create_markdown_document, count_tokens
 if os.getenv('OPENAI_PROXY'):
     openai.proxy = os.getenv('OPENAI_PROXY')
 
+# Set API base for OpenAI API
+if os.getenv('OPENAI_API_BASE'):
+    openai.api_base = os.getenv('OPENAI_API_BASE')
+
 # Load gloabl config
 MAX_CONTEXT_LENGTH = int(os.getenv('MIDSEARCH_MAX_CONTEXT_LENGTH', 3000))
 RATE_LIMIT = os.getenv('MIDSEARCH_RATE_LIMIT', '30/hour')
