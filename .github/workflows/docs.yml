@@ -1,0 +1,39 @@
+name: docs
+
+on:
+  push:
+    branches:    
+      - main
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v1
+        - uses: ammaraskar/sphinx-action@master
+          with:
+            docs-folder: docs/
+        - uses: a7ul/tar-action@v1.1.0
+          with:
+            command: c
+            files: |
+              docs/_build/html
+            outPath: ${{ runner.temp }}/artifact.tar.gz
+        - uses: actions/upload-artifact@v3
+          with:
+            name: github-pages
+            path: ${{ runner.temp }}/artifact.tar.gz
+
+    # deploy:
+    #   needs: build
+    #   permissions:
+    #     pages: write     
+    #     id-token: write  
+    #   environment:
+    #     name: github-pages
+    #     url: ${{ steps.deployment.outputs.page_url }}
+    #   runs-on: ubuntu-latest
+    #   steps:
+    #     - name: Deploy to GitHub Pages
+    #       id: deployment
+    #       uses: actions/deploy-pages@v2
