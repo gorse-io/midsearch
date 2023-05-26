@@ -12,6 +12,9 @@ pgvector==0.1.6
 psycopg2-binary==2.9.6
 python-dotenv==0.21.0
 python-telegram-bot==20.2
+slack==0.0.2
+slackeventsapi==3.0.1
 SQLAlchemy==2.0.9
 tiktoken==0.3.3
 waitress==2.1.2
+wechaty==0.10.7

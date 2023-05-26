@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'midsearch'
+project = 'MidSearch'
 copyright = '2023, zhenghaoz'
 author = 'zhenghaoz'
 

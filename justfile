@@ -25,5 +25,11 @@ debug-telegram-bot: stop-telegram-bot
 debug-discord-bot: stop-discord-bot
     python3 midsearch/client discord
 
+debug-wechaty-bot:
+    python3 midsearch/client wechaty
+
 debug-mirai-bot:
     python3 midsearch/client mirai
+
+debug-docs:
+    sphinx-autobuild docs docs/_build/html
