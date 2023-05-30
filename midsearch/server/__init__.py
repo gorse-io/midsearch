@@ -240,7 +240,7 @@ def delete_document():
 
 
 @app.route("/api/documents/", methods=['GET'])
-@login_required
+@key_required
 def get_documents():
     offset = request.args.get('offset', 0)
     n = request.args.get('n', 10)
