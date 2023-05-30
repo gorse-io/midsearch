@@ -17,5 +17,6 @@ MidSearch is a middleware to connect chat bots to documents search (powered by P
    :caption: Contents:
 
    installation
+   config
    ingestion
    bot
