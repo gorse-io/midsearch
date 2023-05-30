@@ -13,6 +13,7 @@ setup(name='midsearch',
       install_requires=[
           'click==8.0.4',
           'discord.py==2.2.3',
+          'graia-ariadne==0.11.5',
           'python-dotenv==0.21.0',
           'python-telegram-bot==20.2'
       ],
