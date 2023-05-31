@@ -8,10 +8,22 @@ stop-backend:
     docker-compose stop midsearch
 
 stop-telegram-bot:
-    docker-compose stop telegram-bot
+    #!/usr/bin/env bash
+    if docker-compose ps --services | grep -q telegram-bot; then
+        echo docker-compose stop telegram-bot;
+    fi
 
 stop-discord-bot:
-    docker-compose stop discord-bot
+    #!/usr/bin/env bash
+    if docker-compose ps --services | grep -q discord-bot; then
+        echo docker-compose stop discord-bot;
+    fi
+
+stop-slack-bot:
+    #!/usr/bin/env bash
+    if docker-compose ps --services | grep -q slack-bot; then
+        echo docker-compose stop slack-bot;
+    fi
 
 debug-frontend:
     cd frontend && yarn dev
@@ -24,6 +36,9 @@ debug-telegram-bot: stop-telegram-bot
 
 debug-discord-bot: stop-discord-bot
     python3 midsearch/client discord
+
+debug-slack-bot: stop-slack-bot
+    python3 midsearch/client slack
 
 debug-wechaty-bot:
     python3 midsearch/client wechaty
